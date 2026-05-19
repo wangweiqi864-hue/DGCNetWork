@@ -1,0 +1,99 @@
+syntax = "proto3";
+package live;
+import "room/room.type.proto";
+
+//房间设置
+message SetRoomReq {
+enum SetType {
+    // 默认房间信息
+    None = 0;
+    // 修改密码
+    Password = 1;
+  }
+    string name = 3;         //房间名称
+    string password = 4;     //房间密码
+    string greeting = 5;     //房间问候语
+    sint32 category = 6;     //房间标签
+    RoomPattern pattern = 7; //房间模式
+    SetType set_type = 8;    //操作类型
+}
+
+message SetRoomRes {
+    // string old_name = 2;
+    // string new_name = 3;
+    // string old_greeting = 4;
+    // string new_greeting = 5;
+    // bool   is_modify = 6;
+}
+
+// cmdId=100028 广播房间设置
+message BroadcastRoomSet {
+    sint64 room_id = 1;
+    sint64 player_id = 2;
+    string name = 3;
+    string password = 4;
+    string greeting = 5;
+    // sint32 category = 6;
+    RoomPattern pattern = 7; // 鲸鸣房间模式
+    // NewRoomPattern new_pattern = 8; // 新房间模式 6.3.5及之后版本使用
+    // RoomVoice voice = 9;  // 音质
+    // sint32 chair_charm_status = 10;     // 麦序魅力值状态，0为关闭，1为开启 2为暂停
+    string room_image = 11; //房间封面变化
+    // string game_command = 12; // 游戏指令
+    // string stream_address = 13; // 0=游戏播放地址
+    // int32 chair_charm_countdown = 14;//计分器倒计时
+    // int32 chair_charm_total_times = 15;//总的倒计时秒数
+    // int64 decorate_id = 16;             //装饰id 根据模式有所变化
+    // PKResult pk_result = 17;      //如果是pk模式，这里就是pk结果，只有当chair_charm_status 为2的时候
+    // PatternInfo old_pattern = 18; // 房间模式切换前的模式类型名
+    string player_name = 19; // 操作人昵称
+    // PatternInfo new_pattern_v2 = 20; // 房间模式切换后的模式类型名
+    // repeated sint32 game_giftIds = 21;//游戏礼物
+}
+
+
+message PRoomMode {
+  RoomPattern mode = 1;
+  string mode_name = 2;
+  string mode_icon = 3;//图标
+  // 模式状态。-2锁定状态; -1已解锁，永久有效; >0已解锁，模式剩余秒数
+  int32  valid_time = 4;
+  // 类型 1房间模式 2房间玩法
+  //int32 mode_type = 5;
+  // 介绍
+  string mode_intr = 6;
+  //解锁等级
+  int32 unlock_level = 7;
+}
+
+message RoomImage {
+  int64 image_id = 1; // eg:背景ID：200014 背景图：/upload/resources/friend/bg/200014/bg_200014.png 预览图：/upload/resources/friend/bg/200014/show_200014.png
+  string image_name = 2;
+  int32 expire_at = 4;  // 到期时间，秒
+  int64 friend_id = 5;  // 好友id
+  string friend_name = 6;
+}
+
+
+message GetRoomConfReq {
+
+}
+message GetRoomConfRes {
+  //房间名字
+  string room_name = 2;
+  //招呼语
+  string greet = 3;
+  //房间可选模式
+  repeated PRoomMode modes = 4;
+  // 背景图片列表
+  repeated RoomImage images = 5;
+}
+
+message ChangeRoomPatternReq {
+  // pattern不传表示使用上一个使用的模式
+  RoomPattern pattern = 1;
+}
+
+message ChangeRoomPatternRes {
+
+}

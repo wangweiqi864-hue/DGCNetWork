@@ -1,0 +1,180 @@
+syntax = "proto3";
+package live;
+import "room/room.type.proto";
+import "common/common.proto";
+
+
+// sud游戏事件 cmdId=100209
+message BroadcastSudGameEvent{
+  EventType type = 1;
+  SudGameSeatInfo seat = 2;
+  SudGameConf conf = 3;
+  // Sud游戏对应的房间模式
+  RoomPattern pattern = 4;
+  enum EventType {
+    None = 0;
+    // 用户加入
+    UserIn = 1;
+    // 用户退出
+    UserOut = 2;
+    // 踢人
+    Kick = 3;
+    // 再来一局
+    Again = 4;
+    // 修改配置
+    Config = 5;
+  }
+}
+
+// sud游戏结算 cmdId=100210
+message BroadcastSudGameSettleEvent{
+  // Sud游戏对应的房间模式
+  RoomPattern pattern = 1;
+  // 结算明细
+  repeated SettleItem items = 2;
+  // 是否下注
+  bool is_bet = 3;
+  // 游戏时长
+  int32 duration = 4;
+
+  message SettleItem {
+    int64 player_id = 1;
+    string icon = 2;
+    string nickname = 3;
+    int64 gold = 4;
+    // 0:表示没有信息，1:输，2:赢，3:平局
+    int32 is_win = 5;
+    // 排名
+    int32 ranking = 6;
+    int32 score = 7;
+     // 与其他用户的关系，key=friend_type, value=map<int64,int32>，玩家id->好友类型：0-陌生人，1-已屏蔽，2-已关注，3-互关，4-自己
+    map<string, string> ext = 8;
+  }
+}
+
+message GetSudGameConfReq {
+  int64 room_id = 1;
+}
+
+// 飞行棋玩法配置
+// 参考：https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/QuickStartReqData.html
+message SudLudoRule {
+  //默认赛制，0快速，1经典，2竞技；
+  int32 mode = 1;
+  //默认棋子数量,2对应2颗棋子，4对应4颗棋子；
+  int32 chessNum = 2;
+  //默认道具，1要，0不要;
+  int32 item = 3;
+  //是否重摇，1要，0不要
+  int32 isReroll = 4;
+}
+
+// 克朗棋玩法配置
+// 参考：https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/QuickStartReqData.html
+message SudCarromRule {
+}
+
+message SudGameConf {
+  // 是否下注（开启下注，会扣除用户金币）
+  bool is_bet = 2;
+  // 下注金额
+  int32 bet_amount = 3;
+  // 玩法配置 (SudxxxRule的pb二进制)
+  // 1. SudLudoRule 飞行棋玩法配置
+  bytes rule = 4;
+  // 游戏子模式，参考游戏的子模式配置 https://docs.sud.tech/zh-CN/app/Server/API/PushEventData/QuickStartReqData.html
+  // 如克朗棋：1-普通；2-自由积分；3-2v2
+  int32 mode_ex = 5;
+}
+
+message GetSudGameConfRes {
+  // Sud游戏Id
+  string game_id = 1;
+  // 游戏配置
+  SudGameConf conf = 2;
+}
+
+message SudGameGetCodeReq {}
+
+message SudGameGetCodeRes {
+  // 短期令牌
+  string code = 1;
+  // 过期时间
+  int64 expire_date = 2;
+  // appid
+  string appid = 3;
+  // app_key
+  string app_key = 4;
+}
+
+message SudGameJoinAndExitReq {
+  // 操作类型
+  JoinAndExitType opt_type = 1;
+  // 座位号 0开始
+  int32 SeatIndex = 2;
+  enum JoinAndExitType{
+    None = 0;
+    Join = 1;
+    Exit = 2;
+  }
+}
+
+message SudGameJoinAndExitRes {}
+
+message SudGameCreateOrderReq {
+  // 触发的行为动作
+  // 参考 https://docs.sud.tech/zh-CN/app/Server/API/CreateOrder.html
+  // Ludo: reroll_the_dice(重掷骰子) specify_dice_roll(遥控的具体点数)
+  string cmd = 1;
+  // 附加数据 (游戏客户端透传给app客户端有该参数值时需要原样透传)
+  // 参考 https://docs.sud.tech/zh-CN/app/Server/API/CreateOrder.html
+  string payload = 2;
+}
+
+message SudGameCreateOrderRes {
+  // 扣除的金币数量
+  int64 gold = 1;
+}
+
+message SudGameInfoReq {
+  int64 room_id = 1;
+}
+
+message SudGameSeatInfo {
+  int64  player_id = 1;
+  string player_name = 2;
+  string icon = 3;
+  int32 seat_index = 4;
+  common.RoomAdminType admin_type = 5;
+  bool is_ai = 6;
+  bool open_mystery = 7;  // 是否神秘人
+}
+
+message SudGameInfoRes {
+  repeated SudGameSeatInfo seats = 1;
+}
+
+message SudGameManagerReq{
+  OperateType opt_type = 1;
+  int64 player_id = 2;
+  int32 seat_index = 3;
+  SudGameConf conf = 4;
+
+  enum OperateType{
+    None = 0;
+    // 开始游戏
+    StartGame = 1;
+    // 踢出玩家
+    KickPlayer = 2;
+    // 修改配置
+    ModifyConfig = 3;
+    // 再来一局
+    GameAgain = 4;
+    // 添加AI
+    AddAi = 5;
+  }
+}
+
+message SudGameManagerRes {
+
+}

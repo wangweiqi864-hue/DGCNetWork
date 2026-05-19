@@ -1,0 +1,6 @@
+framework module Pods_DGCNetWork_Example {
+  umbrella header "Pods-DGCNetWork_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

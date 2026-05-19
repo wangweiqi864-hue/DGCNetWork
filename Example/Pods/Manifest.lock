@@ -1,0 +1,45 @@
+PODS:
+  - Alamofire (5.8.1)
+  - CocoaAsyncSocket (7.6.5)
+  - KeychainAccess (4.2.2)
+  - DGCLog (0.1.0):
+    - SwiftyBeaver
+  - DGCNetWork (0.1.0):
+    - Alamofire
+    - CocoaAsyncSocket
+    - KeychainAccess (~> 4.2.2)
+    - DGCLog
+    - SwiftProtobuf (~> 1.25.2)
+  - SwiftProtobuf (1.25.2)
+  - SwiftyBeaver (1.9.5)
+
+DEPENDENCIES:
+  - DGCLog (from `../../DGCLog/`)
+  - DGCNetWork (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - CocoaAsyncSocket
+    - KeychainAccess
+    - SwiftProtobuf
+    - SwiftyBeaver
+
+EXTERNAL SOURCES:
+  DGCLog:
+    :path: "../../DGCLog/"
+  DGCNetWork:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Alamofire: 3ca42e259043ee0dc5c0cdd76c4bc568b8e42af7
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
+  KeychainAccess: c0c4f7f38f6fc7bbe58f5702e25f7bd2f65abf51
+  DGCLog: 6e015f1a59d1d01031adfe58a9b54f98e47c1aab
+  DGCNetWork: 4a6d4ebee50804a7e2ba5c9684ebcc4b416d8a7b
+  SwiftProtobuf: 407a385e97fd206c4fbe880cc84123989167e0d1
+  SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
+
+PODFILE CHECKSUM: d6c7a26b5f5042085ebe3cab96807aeb392e56ce
+
+COCOAPODS: 1.11.3

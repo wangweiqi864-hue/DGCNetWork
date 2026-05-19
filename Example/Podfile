@@ -1,0 +1,14 @@
+use_frameworks!
+
+platform :ios, '13.0'
+
+target 'DGCNetWork_Example' do
+  pod 'DGCNetWork', :path => '../'
+  pod 'DGCLog', :path => '../../DGCLog/'
+
+  target 'DGCNetWork_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

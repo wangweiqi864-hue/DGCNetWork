@@ -1,0 +1,222 @@
+syntax = "proto3";
+package login;
+import "common/common.proto";
+
+enum UauthLoginType {
+  LT_DEV = 0;
+  LT_SMS = 4;   // 短信登录
+  LT_APPLE = 6; // apple
+  LT_NATIVE = 1;   // id密码登录
+  LT_FACEBOOK = 7;  // facebook
+  LT_QQ = 2;
+  LT_QUICK = 5; // 一键登录
+  LT_WEIXIN = 3;
+  LT_PHONE_PASSWORD = 8;  // 手机密码登录
+  LT_GOOGLE = 9; // 谷歌
+  LT_SNAPCHAT = 10; // snapchat
+}
+
+// 统一第三方登录
+message ThirdLoginReq {
+  string identity_token = 8; // 苹果登录类型identity_token
+  string device_id = 4; // 设备号
+  string code = 1; // eg：微信访问code
+  int32 channel = 6; // 渠道号
+  string access_token = 2;
+  string app_id = 3;
+  int32 device_type = 5; // 读取 common.ext.proto中的DeviceType
+  string authorization_code = 9; // 苹果登录类型identity_token
+  UauthLoginType login_type = 7; // 登录类型
+  string full_name = 10; // // 苹果登录类型作为nickname
+  map<string, string> afInfoMap = 11;
+}
+
+//统一第三方登录
+message ThirdLoginRes {
+  // 透传登录类型
+  UauthLoginType login_type = 3;
+  // 号码是否注册过
+  bool is_register = 1;
+  // 如果已经注册则登录，并返回登录结果
+  CommonSignInRes login = 2;
+  // 返回登录类型透传的第三方值，qq/wx UnionId，未注册用户走统一第三方注册
+  string value = 4;
+  // 是否需要拉取手机绑定的账号列表 true: 需要 false: 不需要
+  bool need_pull_phone_bind_account = 5;
+}
+
+// 通用登录结果返回
+message CommonSignInRes {
+  string login_token = 1; // login token
+  sint64 user_id = 3;
+  bool is_new = 2; // 是否新账号
+  map<string, string> extends = 4; // 扩展字段
+  UauthLoginType login_type = 5; // 登录类型
+  // 是否需要拉取手机绑定的账号列表 true: 需要 false: 不需要
+  bool need_pull_phone_bind_account = 6;
+}
+
+// 帐号安全检验 是否绑定手机 和设置密码
+message CheckAccountSecurityReq{
+}
+
+message CheckAccountSecurityResp{
+  bool set_password = 1; // 是否已设置密码
+  string bind_phone = 2; // 绑定的手机号，如果没有返回空字符串
+  bool show_exchange_pw = 3; // 是否显示设置兑换金币密码入口
+  bool set_exchange_pw = 4; // 是否已设置兑换金币密码
+}
+
+
+// apple登录
+message SignInWithAppleReq {
+  string full_name = 3; // 作为nickname
+  string identity_token = 1;
+  string authorization_code = 2;
+  string device_id = 4; //设备号
+}
+
+// id或手机密码登录
+message IdOrPhoneLoginReq {
+  string password = 3;
+  int32 country = 1; // 国家区号
+  string value = 2; // id或手机
+  string sign = 4; // 登录签名(废弃了，现在用MD5不需要）
+}
+
+message UpdateBindPhoneReq{
+  string phone = 1; // 新手机号
+  string code = 2; // 验证码
+  int32 country = 3;// 国家码
+}
+
+message UpdateBindPhoneResp{
+
+}
+
+message VerifyExchangePasswordReq{
+  string password = 1;
+}
+message VerifyExchangePasswordResp{
+  int32 code = 1;
+}
+
+message SetExchangePasswordReq{
+  string first_input = 1;
+  string second_input = 2;
+  // 忘记密码，此时不和原密码校验
+  bool forget = 3;
+}
+message SetExchangePasswordResp{
+
+}
+
+// 与 GetSmsCodeReq_Action 相同，以这个为主
+enum SmsAction{
+  Login = 0; // 默认是登录
+  BindPhone = 1;
+  ChangePhone = 2;
+  SetExchangePW = 3; // 设置工资兑换金币密码
+}
+
+message VerifySmsCodeReq{
+  SmsAction action = 1;
+  string code = 2;
+}
+message VerifySmsCodeResp{
+
+}
+
+
+// 获取短信
+message GetSmsCodeReq {
+  enum Action{
+    Login = 0; // 默认是登录
+    BindPhone = 1;
+    ChangePhone = 2;
+    etExchangePW = 3; // 设置工资兑换金币密码
+  }
+  // 手机号
+  string phone = 2;
+  // 国家区号
+  int32 country = 1;
+  // 是否是第三方注册时候获手机验证码
+  bool is_bind = 3;
+  // 区分发短信类型，默认是登录
+  Action action = 4;
+}
+message GetSmsCodeRes {
+  // 号码是否注册过
+  bool is_register = 1;
+}
+
+// 手机短信登录, 当是没有注册的手机时会自动创建
+message LoginWithPhoneSMSReq {
+  // 设备号
+  string device_id = 4;
+  // 国家区号
+  int32 country = 1;
+  // 读取 common.ext.proto中的DeviceType
+  common.DeviceType device_type = 5;
+  // 手机号
+  string phone = 2;
+  // (不再使用，直接使用sms_code) GetSmsTokenReq接口获取
+  string sms_token = 3;
+  // 渠道号
+  int32 channel = 6;
+  // 当不为空时，合并GetSmsTokenReq的请求
+  string sms_code = 7;
+  // 当出现换设备登录出错时,带上此参数
+  int64 account_id = 8;
+}
+
+message LogoutReq {
+    string key = 1;  // sessionKey
+}
+
+message LogoutRes {
+}
+
+// 登录
+message LoginReq {
+    string key = 1;
+    common.DeviceType deviceType = 2;
+    string deviceId = 3;
+    string push_token = 4; // 推送token
+    string CountryCode = 5;//国家代码
+}
+message LoginRes {
+    sint64 account_id = 1;
+}
+
+message DeleteAccountConfirmReq {
+    string code = 1; // 验证码
+}
+
+message DeleteAccountConfirmRes {
+  int32 keep_days = 1; // 保存天数
+}
+
+message ZoneCountry {
+  string country_en = 1; //英文名，用于获取国家图标
+  string country_name = 2; //显示的国家名称（国际化后的文本）
+  int64 country_phone = 3; //国家区号
+  int32 position = 4; //排序
+  string country_code = 5;//国家代码
+}
+
+message GetUserZoneReq{
+}
+
+message GetUserZoneRes{
+  int32 default_index = 1; //用户IP对应国家的序号，如果返回-1，表示用户不在可使用的区域内，用于优选（默认选择）国家
+  repeated ZoneCountry country = 2; //用户IP区域的国家信息
+}
+
+// 通知设备上线
+message BroadcastRelogin {
+  string deviceId = 1;
+  common.DeviceType device_type = 2;
+}
+
+

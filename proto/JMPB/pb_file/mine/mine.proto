@@ -1,0 +1,748 @@
+syntax = "proto3";
+package mine;
+import "common/common.proto";
+import "upload/upload.proto";
+
+message UpdatePasswdReq {
+  string sign = 3; // 登录签名
+  string old_passwd = 1; // 旧密码，需要加密  不用传
+  string new_passwd = 2; // 新密码，需要加密
+  bool is_new = 4; // 是否新账号 CommonSignInRes.is_new 注册界面设置密码时需要传
+}
+message UpdatePasswdRes {
+	//ErrUserPasswdLength      = 33045;    // 密码至少为6位，且必须包含字母和数字
+	//ErrUserPasswdEqual       = 33046;	// 两次输入的密码不一致
+	//ErrUserOriginPasswd      = 33047;    // 原密码错误，请重新输入
+}
+
+// 请求player
+message PlayerReq {
+	sint64 id = 1;  // 注：前端通过context上下文传值
+}
+
+message PlayerRes {
+	Player player = 1;
+	sint64 account_flags = 2;   // common.AccountFlags
+	//repeated Effect effect = 3;         //特效
+	//int32 activity_adchannel = 4;  // 前端不用
+	//ClanInfo clan = 5;                  // 公会信息
+	// sint32 charm_week_rank = 6; // 明星周榜排名 0:未上榜
+	// sint32 wealth_week_rank = 7; // 富豪周榜排名 0:未上榜
+	UserInfo user_info = 8; //用户信息
+	common.ZoneCountry zone_country = 9;  // 用户所属国家，允许为空
+  // 粉丝数
+  sint32 fans_num = 10;
+  // 关注数
+  sint32 follow_num = 11;
+  //好友数量
+  sint32 friend_count = 12;
+  
+	repeated common.UserPrivilege userPrivilege = 13; // 用户特权列表
+	//int64 game_union_id = 11; // 公会ID
+	//int32 ability				= 12;//角色职能id 0 ：普通用户 1:巡房超管 （）
+	//int32 one2one_guildId = 13;//1对1通话公会id，主播才有
+
+	//int32 voice_guildId = 15;//语音通话公会id，主播才有
+	//bool display_discovery = 16; // 是否显示发现页
+	// 用户vip等级
+	//int32 vip_level = 17;
+	//bool in_room_anon = 18; //进房匿名
+	//bool sort_anon = 19; // 排行匿名
+	//bool online_notice_anon = 20; // 上线全服通告匿名
+	// 合伙人头衔
+	//string sub_guild_medal = 21;
+  bool has_video_room_permission = 21; // 是否有视频房权限
+  common.GuildNameplate guild_nameplate = 24; // 公会铭牌
+  int32 new_user_flag = 25; // 新用户标记 1:新用户
+  int64 cp_id = 26; // cpId，麦位连线的对象。0表示未绑定
+  bool is_anchor = 29; // 是否是视频主播
+   bool  OpenMystery = 32;  // 神秘人
+   int32 cp_level = 33; // cp等级
+}
+
+enum PlayerFlags {
+  PF_ZERO = 0;
+  PF_SET_BASE_INFO_OK = 1;//设否设置基本信息
+  PF_IF_SEX_SELECTED = 2;//已选择性别
+  PF_IF_COUNTRY_SELECTED = 3;//已设置国家
+  PF_Greet = 4; // 是否接引人
+  PF_Hide = 5;//是否隐身
+  PF_PWD_ROOM = 6;//是否无视密码房
+  PF_UNKick   = 7;//是否抗被踢
+  PF_SCREENSHOT = 8; // 是否允许截图
+}
+
+// 玩家信息
+message Player {
+  sint64 id = 1; // 游客ID<=0
+  string nickname = 2;
+  common.SexType sex = 3;
+  sint64 id2 = 4; // 靓号. ==0时没有
+  string icon = 5; // 图标
+  sint64 flags = 6; // 标志，按位存储。各位表示意思参考PlayerFlags
+  sint64 flags2 = 30; // 标志，按位存储。各位表示意思参考PlayerFlags_2
+  sint64 charm = 8;
+  sint32 charmLevel = 15; // 魅力等级
+  sint32 wealthLevel = 32; // 财富等级
+  sint32 wealth = 9; // 财富值
+  uint32 online_exp = 10; // 在线经验
+  uint32 createAt = 11; // 注册时间
+  bool has_passwd = 12; // 是否有密码
+  bool is_phone = 13; // 是否是手机号注册
+  sint32 flowerLevel = 33; // 浇花等级
+  sint64 flower = 34; //浇花值
+  bool is_online = 35;//是否在线
+  map<int32, int32> flags_kv = 36; //标记, key-value存储, key:参考 enum PlayerFlagKey{}, value:参考key对应的enum{}
+  bool cs_agent = 40; // 是否为客服
+  string id2Icon = 41; // 靓号图标, 对应id2字段
+  int32 vip_level = 42; // vip等级
+}
+
+message UserInfo {
+  sint64 user_id = 1;
+  string city = 2;
+  string signature = 3;  // 签名
+  string birthday = 4;   // 生日
+  sint32 intimate_slot = 5;  // 挚友位数
+  string mind = 6;       // 心声
+  sint32 short_id_slot = 7;   // 靓号槽数
+  string constellation = 8;  //星座
+  string voice_url = 9;
+  //年龄
+  int32 age = 10;
+  int32 country_code = 11; // 国家通讯码码
+  string chose_cc = 12;//国家代码
+  int32 voice_time = 13;// 声鉴卡长度
+}
+
+enum PUserKey {
+	PU_Zero = 0;
+	PU_Name = 1;//昵称
+	// PU_CITY = 2;//城市
+	PU_SIGN = 3;//签名
+	PU_Birth = 4;//生日
+	PU_CC = 5;//国家
+	// PU_Mind = 6;//
+	PU_SEX 	= 7;//性别
+}
+
+message PUserProperty {
+		PUserKey key = 1;
+		string  str_value = 2;
+		int32  in_value = 3;
+}
+
+message UserInfoV2Req {
+	repeated PUserProperty data = 1;
+}
+
+message UserInfoV2Res {
+
+}
+
+
+
+message QueryIslamicPrayerTimesReq {
+  double latitude = 1; // 维度
+  double longitude = 2; // 经度
+  string timezone = 3; // 时区，例如Asia/Jakarta，Asia/Shanghai
+
+  //（第二版新加功能）翻页基准日期（格式：yyyyMMdd），用来上下翻页使用，返回大于或者小于该时间的日期列表，为空表示使用当前时间
+  string paging_day = 4;
+  //（第二版新加功能）翻页方向，0:前后都要 1: 前翻 2:后翻
+  int32 paging_direction = 5;
+}
+
+message IslamicPrayerTimes {
+  enum PrayerType {
+    None = 0;
+    Fajr = 1;     //晨礼
+    Sunrise = 2;  //日出时间
+    Zuhr = 3;     //晌礼
+    Asr = 4;      //晡礼
+    Maghrib = 5;  //昏礼
+    Isha = 6;     //宵礼
+  }
+  message PrayerTime {
+    PrayerType type = 1;
+    int32 time = 2;      //时间戳
+    string name = 3;
+  }
+
+  repeated PrayerTime prayer_times = 1;
+
+  // 伊斯兰历日期（第二版新加功能）
+  string hijrian_date = 2;
+  string date = 3; // 公历日期
+}
+
+message QueryIslamicPrayerTimesRes {
+  string hijrian_date = 1;         //伊斯兰历日期
+  IslamicPrayerTimes today = 2;    //今天
+  IslamicPrayerTimes tomorrow = 3; //明天
+  IslamicPrayerTimes.PrayerType current_type = 4; // 当前礼拜
+
+  //（第二版新加功能）向前N天的礼拜时间
+  repeated IslamicPrayerTimes prev_days = 5;
+  //（第二版新加功能）向后N天的礼拜时间
+  repeated IslamicPrayerTimes next_days = 6;
+  //（第二版新加功能）基准日期（paging_day）的礼拜时间
+  IslamicPrayerTimes base_day = 7;
+}
+
+message FirstSetUserInfoReq {
+  string birthday = 1;   // 生日
+  string country_code = 2; // 国家通讯码码
+  common.SexType sex = 3;        // 性别
+}
+
+message FirstSetUserInfoRes {
+
+}
+
+//用户举报（举报人或房间）
+message ReportReq {
+  string remark = 4; //举报备注
+  int64 target_id = 1; //被举报人ID或房间号
+  string pic_path = 5; //图片路劲
+  string types = 3; //举报类型
+  int64 player_id = 2; //举报人
+  int64 report_type = 6; //举报的是房间还是人 0房间  1人
+}
+//用户举报返回（举报人或房间）
+message ReportRes {
+
+}
+
+// 获取图片列表 咪窝相册
+message ImageInfo {
+  sint64 id = 1; // 图片id
+  // uint32 width = 2;
+  // uint32 height = 3;
+  // bool is_video = 4;  // 是否视频缩略图
+  string url = 5;    // 使用新的 url，当值不为空时，使用此值，否则使用旧的id
+  // common.AuditStatus status = 6;  // 审核状态
+}
+
+message TypeImageListReq {
+  int64 player_id = 1;
+  UserUploadCommon.PluginUploadType type = 2;
+}
+
+message TypeImageListRes {
+  repeated ImageInfo pics = 1; // 图片列表
+  UserUploadCommon.PluginUploadType type = 2;
+}
+
+// 玩家信息
+message PlayerInfo {
+  Player player = 1;
+  UserInfo user = 2;
+  //特效
+  // repeated Effect effect = 3;
+  // 粉丝数
+  sint32 fans_num = 4;
+  // 关注数
+  sint32 follow_num = 5;
+  // 所在房间id
+  int64 room_id = 6;
+  // //明星周榜排名 0:未上榜
+  // sint32 charm_week_rank = 8;
+  // // 富豪周榜排名 0:未上榜
+  // sint32 wealth_week_rank = 9;
+  // repeated PlayerGiftRank player_gift_rank = 10;
+  // // 所在房间名称
+  // string room_name = 11;
+  // // 所在房间图标
+  // string room_icon = 12;
+  // // 空间页面专用字段：是否显示 room_name、room_icon
+  // bool show_room_info = 13;
+  // 用户所属国家，允许为空
+  common.ZoneCountry zone_country = 14;
+  // 用户特权
+  repeated common.UserPrivilege user_privilege = 15;
+  //是否在线
+  // bool online = 16;
+  //注册小时数
+  // int64 registHour = 17;
+  // //1对1通话公会id，主播才有
+  // int32 one2one_guildId = 18;
+  // // 公会铭牌
+   common.GuildNameplate guild_nameplate = 19;
+  //好友数量
+  sint32 friend_count = 20;
+  // 用户拍拍关系(top1关系)
+  // UserPPRel user_pp_rel = 44;
+  // int32 voice_guildId = 45; // 语音工会id, 语音工会主播才有
+  // 用户vip等级
+  int32 vip_level = 46;
+  // // 合伙人头衔
+  // string sub_guild_medal = 47;
+  bool  OpenMystery = 51;  // 神秘人
+  int32 cp_level = 52; // cp等级
+}
+
+// 请求playerInfo, 1次最多取50个 (取代http=11协议)
+message PlayerInfoListReq {
+  repeated int64 ids = 1;
+}
+
+message PlayerInfoListRes {
+  repeated PlayerInfo list = 1;
+}
+
+// 广播踢下线 cmdid = 501002
+message BroadcastTakeLeave {
+  sint64 account_id = 1;
+}
+
+// 处罚类型
+enum BanType {
+  BT_Zero = 0;
+  BT_Account = 1;  // 封号
+  BT_Speak = 2;  // 禁言
+  BT_Room = 3;  // 封房间
+  BT_IP = 4;    // IP
+  BT_Device = 5;    // 封设备id
+  BT_TakeLeave = 6;  // 踢下线
+  BT_Warning = 8;    // 警告
+  // BT_Top = 9;      // 置顶
+  // BT_BroadcastFriend = 10;  // 禁止广播交友
+  BT_tickout_room = 11; // 提出房间
+  BT_BAN_PHONE = 12; // 封手机号
+  // BT_BAN_IDCARD = 13; // 封身份证
+  BT_BAN_PM = 14;  // 禁私聊
+  // BT_CommunityPublish = 15; //社区:限制发布动态
+  // BT_CommunityComment = 16; //社区:限制评论动态
+  // BT_BAN_Modify = 17; //禁修改资料
+  // 系统维护
+  BT_BAN_Maintain = 18;
+}
+
+// 广播处罚类型 cmdid = 500008   SSC100051
+message BroadcastBan {
+  uint32 banType = 1;
+  uint32 status = 2;    // 0解除/1生效
+  uint32 time = 3;    // 剩余时间,单位:秒
+  string remark = 4;    // 原因
+  uint64 operaterId = 5;  // 操作人， =0时，后台管理操作
+}
+
+// cmdId=1006 广播魅力升级
+message BroadcastCharmLevel  {
+  sint64 id = 1;
+  string name = 2;
+  int64 charm = 3;
+  int32 charm_level = 4;
+}
+
+// cmdId=1007 广播财富升级
+message BroadcastWealthLevel {
+  sint64 id = 1;
+  string name = 2;
+  int64 wealth = 3;
+  int32 wealth_level = 4;
+}
+
+// cmdId = 500031
+message RelationshipLevelUpEvent{
+  // 关系类型
+  RelationshipType type = 1;
+  // 关系等级
+  int32 level = 2;
+  // 邀请者
+  Player inviter = 3;
+  // 被邀请者
+  Player invitee = 4;
+  // 关系状态
+  RelationshipStatus status = 5;
+  // 升级动效
+  string effect = 6;
+  // 资源key-左边头像
+  string left_avatar = 7;
+  // 资源key-右边头像
+  string right_avatar = 8;
+  // 资源key-左边昵称
+  string left_nickname = 9;
+  // 资源key-右边昵称
+  string right_nickname = 10;
+}
+
+// VipUserLogin vip用户登录，全服广播
+// cmdId = 500030
+// 一个小时内多次登录，只广播一次
+message VipUserLoginEvent{
+  int64 user_id = 1;
+  string nickname = 2;
+  string avatar = 3;
+  int32 vip_level = 4;
+}
+
+// cmdId = 500029
+// 客服清空用户信息时，将清空后的用户昵称、头像和房间封面广播到房间。
+// 这个广播会推送两次，第一次是目标用户当前所在房间，第二次是目标用户自己的房间（这次是为了实时更新房间封面）
+message CsAgentUpdateInfoEvent{
+  string nickname = 1;
+  string avatar = 2;
+  string room_image = 3; // 房间封面
+  int64 target_id = 4; // 目标用户
+}
+
+
+enum UserStatusErr {
+  UserStatusSUCCESS 			= 0;	// 成功
+  ErrUserStatusKeyExpired 		= 37001;	// key失效, 请重新登录
+  ErrUserStatusBanAccount  	= 37002;	// 被封号
+  ErrUserStatusBanIp			= 37003;	// 封ip
+  ErrUserStatusRelogin			= 37004;	// 需要重新登录
+  ErrUserStatusTakeLeave       = 37005;	// 被踢下线
+  ErrUserStatusBanDevice       = 37006;    // 封设备
+  ErrUserStatusBanPhone        = 37009;    // 封手机
+  ErrUserStatusBanIdCard       = 37010;    // 封身份证
+
+  RoomBan       = 34020;    // 房间禁言
+  RoomSealed       = 34044;    // 房间被封
+  RoomKitOut       = 34005;    // 被踢出房间
+  RoomUnPrivateChat       = 120003;    // 禁私聊
+  SystemMaintain       = 16666;    // 16666
+}
+
+enum SubscribeEventType {
+  Sub_None = 0;  //占位
+  Sub_ONLINE_ROOM = 1;  //上下线进出房
+}
+
+enum SubscribeOption {
+  OP_Zero = 0;
+  OP_Add = 1;//追加
+  OP_REMOVE = 2;//移除
+}
+
+message SubscribePlayerReq {
+  SubscribeEventType eventType = 1;//订阅类型
+  repeated int64 player_ids = 2;  //订阅用户id
+  SubscribeOption op = 3;//操作类型
+}
+
+enum UserEventType {
+  Event_None = 0;//占位
+  Event_ONLine = 1;//上线
+  Event_OffLine = 2;//下线
+  Event_JoinRoom = 3;//进房
+  Event_LeaveRoom = 4;//离开房间
+  Event_SettingPrivate = 5;//隐私设置变化
+}
+
+message PUserStatus {
+  int64 playerId = 1;//用户id
+  bool  isOnline = 2;//是否在线
+  int64 InRoomId = 3;//所在房间id 可能为0
+}
+
+enum LimitImType {
+  Lim_Zero = 0;//占位
+  Lim_Picture = 1;//图片
+  Lim_Audio = 2;//声音
+  Lim_Video = 3;//视频
+}
+
+message PLimitInfo {
+  LimitImType im_type = 1;
+  int32 min_wealth_level = 2;//最低财富等级 0 无限制 非0 限制最小等级
+  int32 min_charm_level = 3;//最低财富等级
+  bool IsFriend = 4;//是否互关的好友
+  string ToastArLang = 5;//阿语提示
+  string ToastEnLang = 6;//英语提示
+}
+
+message IMPrivateLimitBroadCast {
+  repeated  PLimitInfo  im_limit = 1;
+}
+
+message SubscribePlayerRes {
+  repeated PUserStatus  users = 1;//用户态列表
+  repeated PLimitInfo    im_limit = 2;//私聊条件
+}
+
+message SubEventNotice {
+  int64 playerId = 1;//用户id
+  UserEventType ev_type = 2;//用户事件
+  repeated int32 ev_args = 3;//事件参数：进出房间有房间id
+}
+
+
+//跟随进房获取房间ID
+message FollowUserRoomReq {
+  int64 player_id = 1;
+}
+
+message FollowUserRoomRes {
+  int64 room_id = 1;
+}
+
+
+message RoomBasicInfo {
+  sint64 room_id = 1;        // 房间Id
+  string name = 2;           // 房间名称
+  string greeting = 3;       // 欢迎语
+  sint32 pattern = 4;        // 房间模式
+  bool is_enter_pwd = 5;     // 是否加锁
+  int64 online_num = 6;      // 在房人数
+  repeated string icons = 7; // 在房前3头像
+  string room_image = 8;     // 房间封面
+  bool is_live = 9;          // 是否直播中
+}
+
+//获取房间房间信息请求
+message RoomBasicInfoReq {
+  sint64 room_id = 1;
+}
+
+//返回对应房间Id的房间信息
+message RoomBasicInfoRes {
+  RoomBasicInfo room = 1;
+}
+
+//获取房间房间信息请求
+message RoomBasicInfoSortReq {
+  sint64 room_id = 1;
+}
+
+//返回对应房间Id的房间信息
+message RoomBasicInfoSortRes {
+  RoomBasicInfo room = 1;
+}
+
+
+message UserCenterExtraListReq{
+
+}
+message UserCenterExtraListRes{
+  repeated UserCenterRow list = 1;
+}
+
+message UserCenterRowExt {
+  int32 DailyTaskRemainingSeconds = 1; //每日任务剩余秒数（key=Task && 值大于0时显示）
+}
+
+message UserCenterRow{
+  string key = 1; // 菜单关键字，如果本地有，则忽略
+  string title = 2; // 菜单名称（多语言）
+  string icon = 3; // OSS 图标地址，一般是/appres下地址
+  string route = 4; // 页面路由
+  UserCenterRowExt ext = 5; //菜单扩展
+  //扩展数据结构
+  string data          = 6;
+}
+
+// 所使用客户端类型
+enum UauthDeviceType {
+  DT_UNKNOWN = 0;
+  DT_IOS_PHONE = 40;
+  DT_ANDROID_PHONE = 20;
+  DT_ROBOT = 100;
+}
+
+message ReportDataReq {
+  UauthDeviceType deviceType = 1;
+  string AfDeviceID          = 2; // Af的ID
+  string AppsFlyerUID        = 3;//afUID
+}
+message ReportDataRes {
+
+}
+
+
+// 背包请求
+message AssetsBagReq {
+
+}
+
+// 背包返回
+message AssetsBagRes {
+  uint32 flag = 1;            //1请求返回全部，2推送单个更新
+  repeated BagItem items = 2;            // 背包道具列表
+}
+
+message BagItem {
+    uint32 gift_id = 1;              // 礼物id
+    uint32 amount = 2;              // 数量
+    string cteate_at =  3;            // 时间
+}
+
+// 300102
+message AssetsBag {
+  repeated BagItem items = 1;            // 背包道具列表
+}
+
+message UserShortIdInfoReq{
+  int64 Id = 1;  // id 或者靓号id
+}
+
+message UserShortIdInfoRes{
+  int64 PlayerId = 1;  //
+  string PlayerName = 2;  //
+  int64 ShortId = 3;  // 靓号id
+  string ShortICon = 4;  //靓号icon
+  string PlayerIcon = 5; // 头像
+  int64 PrivilegeId = 6; // 当前正在使用的靓号特权ID
+}
+
+// ------- CP 与 朋友 ---------//
+// RelationType 关系类型
+enum RelationshipType {
+  RT_Unknown = 0;
+  RT_CP = 1; // cp关系
+  RT_Friend = 2; // 朋友关系
+}
+
+message InviteReq {
+  int64 player_id = 1;
+  RelationshipType type = 2;
+}
+message InviteRes {
+    // 邀请id
+  int64 invite_id = 1;
+}
+
+message HandleInviteReq {
+  // 邀请id
+  int64 invite_id = 1;
+  // 1-接受，2-拒绝
+  int32 operate = 2;
+}
+message HandleInviteRes {
+}
+
+message QueryRelationshipListReq {
+  int64 player_id = 1;
+}
+message QueryRelationshipListRes {
+  // cp关系
+  RelationshipInfo cp = 1;
+  // 朋友关系列表。服务端控制显示数量
+  repeated RelationshipInfo friends = 2;
+}
+
+message OperateRelationshipReq{
+  int64 relationship_id = 1; // 关系id
+  int32 operate = 2; // 1-解绑，2-取消解绑
+}
+message OperateRelationshipRes{
+}
+
+message ModifySignatureReq{
+  int64 relationship_id = 1;
+  string signature = 2;
+}
+message ModifySignatureRes{
+}
+
+message RelationshipInfo{
+  // 关系id
+  int64 relationship_id = 1;
+  // 关系类型
+  RelationshipType type = 2;
+  // 邀请者
+  Player inviter = 3;
+  // 被邀请者
+  Player invitee = 4;
+  // 关系状态
+  RelationshipStatus status = 5;
+  // 关系等级
+  int32 level = 6;
+  // 绑定时间
+  string bind_time = 7;
+  // 签名
+  string signature = 8;
+  // 是否隐藏
+  bool is_hidden = 9;
+   // 是否为不可用的席位
+  bool lock = 10;
+  // 邀请者靓号特权
+  common.Effect inviter_effect = 11;
+  // 受邀者特权靓号特权
+  common.Effect invitee_effect = 12;
+}
+
+enum RelationshipStatus {
+  // 等待对方确认
+  RS_PENDING    = 0;
+  // 已绑定（生效中）
+  RS_ACTIVE     = 1;
+  // 解绑处理中
+  RS_UNBINDING  = 2;
+  // 已解除
+  RS_UNBOUND    = 3;
+  // 已拒绝
+  RS_REJECTED   = 4;
+  // 已过期
+  RS_EXPIRED    = 5;
+}
+
+message HideRelationshipReq{
+  RelationshipType type = 1; // 隐藏关系板块
+  int32 operate = 2 ; // 1-隐藏 2-解除隐藏
+}
+message HideRelationshipRes{
+}
+
+
+message QueryInvitationLetterReq{
+  int64 invite_id = 1;
+}
+
+message QueryInvitationLetterRes{
+  Player inviter = 1;
+  Player invitee = 2;
+  RelationshipType type = 3;
+  // 关系状态，取值：等待接受、已接收、已拒绝、已过期
+  RelationshipStatus status = 4;
+  // 信物名称
+  string token_name = 5;
+  // 信物金币
+  int32 token_gold = 6;
+  // 信物图标
+  string token_icon = 7;
+}
+
+message GetRelationshipConfigReq{
+
+}
+message GetRelationshipConfigRes{
+  // cp爱心。等级->资源
+  map<int32, string> cp_love = 1;
+  // cp秀。等级->资源
+  map<int32, string> cp_show = 2;
+  // cp上麦特效
+  string cp_mic_effect = 3;
+  // cp上麦特效（镜像）
+  string cp_mic_effect_mirror = 4;
+}
+
+// 查询cp情侣连续点亮鲜花天数
+message QueryCpFlowerLightDaysReq {
+  // 用户id1
+  int64 uid1 = 1;
+  // 用户id2
+  int64 uid2 = 2;
+}
+
+message QueryCpFlowerLightDaysRes {
+  // 是否是情侣
+  bool is_cp = 1;
+  // 连续点亮鲜花天数
+  int32 days = 2;
+  // 今天是否有送礼
+  bool has_send_gift_today = 3;
+}
+
+// cmd=500032
+message CpFlowerLightDaysChangeEvent {
+  // 用户id1
+  int64 uid1 = 1;
+  // 用户id2
+  int64 uid2 = 2;
+  // 当前连续点亮鲜花天数
+  int32 days = 3;
+}

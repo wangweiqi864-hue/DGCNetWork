@@ -1,0 +1,39 @@
+{
+  "name": "DGCNetWork",
+  "version": "0.1.0",
+  "summary": "A short description of DGCNetWork.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/admin/DGCNetWork",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "admin": "huan.xin@renrengame.com"
+  },
+  "source": {
+    "git": "https://github.com/admin/DGCNetWork.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "13.0"
+  },
+  "source_files": "DGCNetWork/Classes/**/*",
+  "dependencies": {
+    "Alamofire": [
+
+    ],
+    "CocoaAsyncSocket": [
+
+    ],
+    "DGCLog": [
+
+    ],
+    "SwiftProtobuf": [
+      "~> 1.25.2"
+    ],
+    "KeychainAccess": [
+      "~> 4.2.2"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+framework module Pods_DGCNetWork_Tests {
+  umbrella header "Pods-DGCNetWork_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

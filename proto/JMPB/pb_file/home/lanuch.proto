@@ -1,0 +1,44 @@
+
+syntax = "proto3";
+package lanuch;
+
+message GetFutureSplashAdsReq{
+    int64 player_id = 1;
+}
+message GetFutureSplashAdsRes{
+    SplashAdsRes currentSplashAds = 1;
+    repeated string cacheUrls = 2; // 需要缓存资源的地址
+    // 主题
+    repeated AppTopic topic = 3;
+    // 生日特权(提前3天返回)
+    BirthdayPrivilege birthdayPrivilege = 4;
+    message SplashAdsRes{
+        int32 splashAdsId = 1; // 开屏广告ID，上报需要
+        string splashAdsUrl = 2; // 开屏广告资源地址，如果未缓存，则不用播放，有缓存才播放
+        int32 advtTcSec = 3; // 开屏广告秒数
+        string fowardModeCode = 4; // 跳转模式代码：0=不跳转 1=跳转房间 2=跳转URL
+        string fowardRes = 5; // 跳转资源。跳转房间时为房间ID，跳转URL时为URL的完整地址
+        string splashAdsName = 6; // 广告名称，用于上报计数
+        int64 endTime = 7; // 结束时间
+    }
+    message AppTopic {
+        // id
+        int32 id = 1;
+        // 主题名
+        string topic = 2;
+        // 主题资源链接
+        string url = 3;
+        // 开始时间戳（单位秒）
+        int64 start = 4;
+        // 结束时间戳（单位秒）
+        int64 end = 5;
+    }
+    message BirthdayPrivilege {
+        string nickname = 1;
+        string icon = 2;
+        // 背景资源
+        string bg = 3;
+        // 生日时间戳
+        int64 birthday = 4;
+    }
+}

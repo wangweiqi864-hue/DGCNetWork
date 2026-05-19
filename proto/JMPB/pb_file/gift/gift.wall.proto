@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package Gift;
+
+//获取房间列表
+message WallListReq {
+    // 用户id
+    int64 playerId = 1;
+}
+
+//获取房间列表返回
+message WallListResp {
+    repeated GiftWallItem giftWall = 1;
+    int32 count = 2; // 点亮数量
+    int32 grayCount = 3;// 未点亮数量
+}
+
+//个人主页礼物墙
+message GiftWallItem {
+    uint32 giftId = 1;
+    uint32 amount = 2;
+    uint32 gold = 3;
+}
+
+
+
+//未点亮礼物墙
+message GrayGiftWallReq {
+  int64 player_id = 1; // 玩家id
+}
+message GrayGiftWallRes {
+  repeated GrayGift gifts = 1;  // 未点亮礼物列表
+  int32 count = 2; // 点亮数量
+  int32 grayCount = 3;// 未点亮数量
+}
+
+message GrayGift {
+  uint32 gift_id = 1;             // 礼物id
+}

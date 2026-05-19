@@ -1,0 +1,35 @@
+syntax = "proto3";
+package search;
+import "common/common.proto";
+
+message SearchPlayersReq {
+    sint32 page = 1;    // 页数
+    sint32 pageSize = 2;  // 每页多少条数据 (有cache，pageSize不要随便变！）
+    string key_word = 3;  // 搜索关键词，房间Id或用户Id或公会Id以及房间名等
+    bool   if_room = 4; //是否搜索房间，否=搜索ID和用户，是=搜索房间名
+}
+
+message SearchPlayersRes {
+    sint32 page = 1;      // 页数
+    sint32 pageSize = 2;    // 每页多少条数据
+    repeated SearchPlayerEntry list = 3;
+}
+
+// 搜索条目
+message SearchPlayerEntry {
+    sint64 id = 1;
+    sint64 id2 = 2; // 靓号. ==0时没有
+    string nickname = 3;
+    common.SexType sex = 4;
+    string icon = 5; // 图标
+    // sint64 charm = 6;
+    // sint32 charm_level = 7; // 魅力等级
+    // sint64 wealth = 8; // 财富值
+    // sint32 wealthl_evel = 9; // 财富等级
+    bool online = 10; // [default=false];
+    sint64 room_id = 11; //用户当前所在房间
+    // bool has_passwd = 13; //用户在线并身处某房间时，标识该房间是否有密码,true为有密码，false为没有密码
+    // string room_name = 14; //房间名称
+    // string room_image = 15; //房间封面
+    repeated common.Effect effect = 16; // 用户特权ID
+}

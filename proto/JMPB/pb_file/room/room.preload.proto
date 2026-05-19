@@ -1,0 +1,37 @@
+syntax = "proto3";
+package live;
+
+// import "common/common.proto";
+import "room/room.type.proto";
+import "room/room.seat.proto";
+// import "room/room.player.proto";
+
+message PreloadedRoomReq {
+  int64 room_id = 1;
+}
+
+message PreloadedRoomRes {
+  repeated Seat seats = 1;            // 嘉宾位列表
+  RoomPattern pattern = 2; // 当前房间模式
+  int64  onlinePlayer = 3; // 当前在线玩家数量
+  RtcInfo rtc_info = 4;     //
+  string Background = 5;
+  string title = 6;
+  string greeting = 7;
+  string icon = 8;
+  int64 room_id = 9;
+  RoomType type  = 10; //房间类型
+  bool has_password = 11;//是否有密码
+  // 当前房间正在开启的子模式（值：RoomPattern）
+  repeated int32 sub_pattern_list = 12;
+  // 开播Id
+  string live_id = 13;
+}
+
+message LeavePreLoadedReq{
+  int64 room_id = 1;
+}
+
+message LeavePreLoadedRes {
+
+}

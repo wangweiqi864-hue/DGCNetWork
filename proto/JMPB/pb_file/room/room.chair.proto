@@ -1,0 +1,61 @@
+syntax = "proto3";
+package live;
+import "room/room.type.proto";
+import "room/room.player.proto";
+
+enum SitChairType {
+  // 普通上麦
+  SCT_NormalSit = 0;
+  // 匿名上麦
+  SCT_MaskSit = 1;
+  // 遵循上一次，后台用
+  //SCT_FollowLast = 2;
+}
+
+
+// 请求排麦列表 GetChairQueue
+message ChairQueueReq {}
+
+message ChairQueueRes {
+  repeated LivePlayer queue = 14; // 排麦列表 （注：此ScenePlayer只有id，name, icon 3个字段可用）
+  bool ban_queue_status = 1;  // 队列状态； false可排麦，true不可排麦
+  // 请求列表者的序号，没有则返回-1
+  int32 ranking = 2;
+}
+
+// 加入/退出排麦 OptChairQueue
+message ChairQueueOptReq {
+  uint32 type = 2; // 0加入，1退出
+  int64 target_id = 3;    // 被添加/移除排麦的目标id， 当!=0时，被管理员插入队列
+  // 排麦类型
+  SitChairType sit_type = 4;
+}
+message ChairQueueOptRes {}
+
+// 排麦插队 JumpChairQueue
+message ChairQueueJumpReq {
+  sint64 target_id = 2; // 目标用户id
+}
+message ChairQueueJumpRes {}
+
+
+//设置房间上麦模式 SwitchRoomChairMode
+message SwitchRoomChairModeReq {
+  SeatModeType mode_type  = 1; // 0：自由模式；1：排麦模式
+}
+
+message SwitchRoomChairModeRes {}
+
+//CmdId=100202
+message RoomChairModeChange {
+  SeatModeType mode_type  = 1; // 0：自由模式；1：排麦模式
+}
+
+//cmdId = 110013 
+//房间权限变更
+message BroadCastRightChange {
+  //1：增加 2：移除
+  int32 add_or_remove           =1;
+  //权限代码 1: 视频模式
+  int32 right_code              =2;
+}

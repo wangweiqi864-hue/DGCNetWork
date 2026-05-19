@@ -1,0 +1,481 @@
+syntax = "proto3";
+package gift;
+import "common/common.proto";
+
+enum GiftCmdId { //300
+                   GiftNone1 = 0; //
+                   GiftBroadCmdId = 400101; //GiftBroadcast 推送公屏
+                   MagicGiftBroadCmdId = 400102; //MagicGiftBroadcast 推送魔法礼物公屏
+                   GiftComboEndCmdId = 400103;
+
+}
+
+enum GiftBgType {
+                   GiftBgTypeNone = 0; //无背景
+                   GiftBgTypeBule = 1; //蓝
+                   GiftBgTypePink = 2; //粉红
+                   GiftBgTypeOrange =  3; //橙色
+                   GiftBgTypePurple = 4; //蓝
+                   GiftBgTypeRunwy = 999; //跑道
+
+
+}
+
+message GiftShow {
+    sint64 playerId = 1;
+    uint32 giftId = 2;
+    uint32 amount = 3;
+    uint64 gold = 4; // 前端不用
+}
+
+
+message GiftConfigItem {
+    uint32 gift_id = 1;             // 礼物id
+    uint32 category_id = 2;         // 礼物大分类
+    string image_url = 3;           // 用于里面列表里面展示的小图标
+    string img_small_anim = 4;      // 小动画图片地址
+    string mut_animation_url = 5;   // 大动画下载地址zip包
+    string version = 6;             // 版本
+    uint64 duration = 7;            // 持续时间
+    string name = 8;                // 礼物名字
+    string gift_description = 9;    // 礼物描述
+    uint32 price = 10;               // 价格
+    uint32 gift_type = 11;          // 礼物类型，0是小礼物，1是大礼物
+    uint32 transfer = 12;           // 能否转赠
+    uint32 dynamic = 13;            // 是否动态显示礼物(根据库存)
+    uint32 gift_wealth_level = 14;  // 动画的财富等级
+    bool show_in_room = 15;         // 是否显示在动画面板
+    bool is_week_gift = 16;     // 1是, 0否
+    uint32 present_type = 17;       // 赠送类型 1只消耗背包 2背包+金币 3其他
+    uint32 type = 18;       // 类型 // 礼物服务端类型 1-普通-可以赠送; 2-宝石; 3-其他-不能赠送; 4-特效道具; 5-宝箱; 6-魔法礼物 7-延迟到账礼物; 8-祝福礼物; 10-资产; 11-通告礼物(extra_data:GiftExtraNotice)；99-不在客户端显示;
+    uint32 room_pattron = 20;           // 房间模式 5-生日派对
+    uint32 sort = 21;           // 显示排序
+    uint32 gift_detail = 22;           // 窝里的礼物墙显示状态 0=下架   1=热销  2=限定
+    uint32 fun_type = 23;           // 物品使用类型
+    string fun_args = 24;           // 物品使用类型 参数
+    string room_ids = 25;           // 指定房间id
+    string room_tips = 26;           // 指定标签
+    sint32 classify  = 27;           // tab分类
+    sint64 begin  = 28;           // 开始时间
+    sint64 end  = 29;           // 结束时间
+    repeated int32 gift_number = 33;          // 礼物可以赠送的数量
+    bool show_in_gift_detail = 34;         // 是否显示礼物墙
+    bool all_send = 35;                     // 是否全麦批送
+    bytes extra_data = 40;          // 根据type，创建对应的结构体
+    bool is_mask_on = 41;               // 动画遮罩 1有 0无
+    bool is_can_buy = 42;               // 是否可以购买
+    string get_way = 43;                // 礼物获得方式
+    int32 gift_act_id = 44;             // 活动关联专属ID
+    int32 gift_user_vip = 45; // 礼物所需vip等级
+    string banner = 46;       // 礼物面板banner（H5） @since 1.4.0
+    string badge = 47;        // 脚标图片 @since 1.4.0
+    string EmbeddingData = 48;    // 嵌入到特权动画资源的参数  
+    int64  custom_rank = 49; // 值为1,2,3 定制礼物前三名
+    bool is_cp_gift = 50; // 是否是cp礼物
+    int32 cp_level = 51; // 解锁cp等级
+}
+
+// 通告礼物 展示效果
+enum  GiftNoticeShowType {
+    ENShowType_None             = 0;    // 无效果
+    ENShowType_RoomBarrage      = 1;    // 房间弹幕
+    ENShowType_AllScroll        = 2;    // 全服横幅
+}
+
+// 通告礼物
+message GiftExtraNotice {
+    GiftNoticeShowType show_type             = 1; //展示效果
+    string content_prefix                    = 2; //内容前缀 举例：%frome_name深情地对 %to_name说；%frome_name代表送礼者；%to_name代表收礼者
+    string name_color                        = 3; //名字颜色
+    string content_color                     = 4; //定制内容文字颜色
+    string input_background_url              = 5; //输入框背景url
+    string input_button_url                  = 6; //输入框按钮url
+    string input_show_background_url         = 7; //弹出展示窗url
+    string input_title_color                 = 8; //输入框标题颜色
+    string input_placeholder                 = 9; // 输入框默认值
+    string scroll_background_url             = 10; // 横幅 背景url
+    string barrage_graduate_color_start      = 11; // 弹幕渐变颜色开始
+    string barrage_graduate_color_end        = 12; // 弹幕渐变颜色结束
+    string show_content_color                = 13; // 弹幕/横幅 颜色
+    bool   is_card                           = 14; // 是否有卡片
+    string card_background_url               = 15; //卡片url
+    string card_button_url                   = 16; //卡片按钮url
+    string card_text_color                   = 17; //卡片文字颜色
+    string card_thumbnail_url                = 18; //卡片缩略图url
+    bool is_broadcast_bg                     = 19;  //是否有(聊天区)公屏背景
+    string broadcast_bg_color_start            = 20;  //(聊天区)公屏背景开始颜色
+    string broadcast_bg_color_end              = 21;  //(聊天区)公屏背景结束颜色
+    int32 broadcast_bg_transparency_start     = 22;  //(聊天区)公屏背景开始透明度 结束透明度客户端写死 0
+    string pc_input_background_url           = 23; //pc 输入框背景url
+    string pc_input_button_url               = 24; //pc 输入框按钮url
+    string pc_input_show_background_url      = 25; //pc 弹出展示窗url
+    string pc_scroll_background_url          = 26; //pc 横幅 背景url
+    string pc_card_background_url            = 27; //pc 卡片url
+    string pc_card_button_url                = 28; //pc 卡片按钮url
+    string pc_card_thumbnail_url             = 29; //pc 卡片缩略图url
+}
+
+
+
+message NewUserGiftItem {
+	uint32 gift_id = 1;
+	string image = 2;
+	string name = 3;
+	string gift_description = 4;
+	uint32 new_user_gift = 5;
+	uint32 number = 6;
+}
+
+message CustomGiftInfoReq {
+}
+
+message CustomGiftInfoRes {
+  int64 score = 1;   // 用户积分
+  int64 need_score = 2; // 定制所需积分
+  int64 renew_need_score = 3; // 续期所需积分
+  repeated CustomGiftSubmit list = 4; // 提交记录
+
+
+  message CustomGiftSubmit {
+    int64 id = 1 ; // 唯一id
+    string icon = 2; // 封面 Base64
+    string name = 3; // 名字
+    int64 valid_time = 4; // 有效期
+    bool is_valid = 5; // 是否在有效期内
+    CustomGiftState state = 6; // 状态 0审核中 1通过 2拒绝
+  }
+
+  enum CustomGiftState {
+    CustomGiftState_None = 0;
+    CustomGiftState_Reviewing = 1; // 审核中
+    CustomGiftState_Pass = 2; // 审核通过
+    CustomGiftState_Rejected = 3; // 审核未通过
+  }
+}
+
+// 删除自定义礼物
+message CustomGiftDeleteReq {
+  int64 id = 1;
+}
+message CustomGiftDeleteRes {
+  int64 id = 1;
+}
+
+// 续期自定义礼物
+message CustomGiftRenewReq {
+  int64 id = 1;
+}
+message CustomGiftRenewRes {
+}
+
+message  CustomGiftSubmitReq {
+  string icon = 1; // 封面 Base64
+  string name = 2; // 名字
+  string file = 3; // 文件 Base64
+}
+
+message CustomGiftSubmitRes {
+}
+
+
+message CustomGiftRankReq {
+  int64 page = 1;
+  int64 page_size = 2;
+}
+
+message CustomGiftRankRes {
+  int64 total = 1;
+  repeated CustomGiftRank list = 2;
+
+  message CustomGiftRank {
+    int64 rank = 1;
+    int64 score = 2;
+    string icon = 3;
+    string gift_name = 4;
+    string user_name = 5;
+  }
+}
+
+
+
+message GiftConfigItemList {
+    repeated GiftConfigItem gifts = 1;
+    repeated NewUserGiftItem dayOne = 2;
+    repeated NewUserGiftItem dayTow = 3;
+    repeated NewUserGiftItem dayThree = 4;
+    repeated NewUserGiftItem firstCharage = 5;
+}
+
+enum SendGiftType {
+  SGT_ZERO = 0;
+  // 视频通话
+  SGT_VIDEO_CALL = 1;
+  // im直接送礼
+  SGT_IM_GIFT = 2;
+  // 语音通话
+  SGT_VOICE_CALL = 3;
+  // 竞拍送礼（该类型的送礼请求，可以送礼给自己）
+ //SGT_PP_GIFT = 4;
+}
+
+enum SendGiftAction {
+    // 默认
+    SGA_DEFAULT = 0;
+    // 送礼后解锁IM付费限制
+    SGA_PAYMENT_LIMIT_UNLOCK = 1;
+    // 送礼后解锁打招呼的图片&视频
+    SGA_PAYMENT_LIMIT_PIC = 2;
+}
+
+// 赠送礼物
+message GiftPresentReq {
+    sint64 to_id = 1; // 被赠送者id
+    uint32 gift_entry = 2; // 礼物id
+    uint32 gift_num = 3;
+    string msg = 4;  // 祝福语
+    bool if_outside_room = 5; //true=房间外送礼 false=房间内送礼
+    SendGiftType send_type   = 6;//送礼类型 非0 就是房间外的送礼
+    SendGiftAction action = 7; // 送礼后动作，0：普通；1：解锁IM付费拦截
+}
+
+// 批量赠送礼物
+message GiftBatchPresentReq {
+	repeated sint64 to_ids = 1; // 被赠送者id
+	uint32 gift_entry = 2; // 礼物id
+    uint32 gift_num = 3;
+	string msg =        4;  // 祝福语
+}
+
+message GiftPresentRes {
+    //操作类型，1普通赠送，2批量赠送
+    uint32 op_type = 1;
+    //目标用户id
+    repeated sint64 to_ids = 2;
+    // 发送者id
+    sint64 id = 3;
+    // 发送者名称
+      string name = 4;
+    // 头像
+    string icon = 5;
+    //财富登记
+      uint32 wealth_level = 6;
+    // 礼物id
+      uint32 gift_entry = 7;
+    // 礼物数量
+    uint32 gift_num = 8;
+}
+
+message GiftBroadcastBatch {
+  repeated GiftBroadcast gift_broadcast = 1;
+  //是否全麦
+  bool is_all = 2;
+}
+
+// 广播礼物消息房间
+message GiftBroadcast {
+  // 发送者id
+  sint64 id = 1;
+  // 发送者名称
+  string name = 2;
+  // 礼物id
+  uint32 gift_entry = 3;
+  // 头像
+  string icon = 4;
+  uint32 wealth_level = 5;
+  // 接收者名称
+  string receive_name = 6;
+  uint32 gift_num = 7;
+  // 接收者id
+  sint64 receive_id = 8;
+  // 接收者头像
+  string receive_icon = 9;
+  //sint64 room_id2 = 10;  // 房间靓号
+  //  bool  type = 11;	// true全服 false房间
+  sint64 room_id = 12;  // 房间号
+  //  GiftBgType bg_type = 13;  // 动画背景
+  uint32 gift_type = 16;      // 赠送礼物类型 5-宝箱 6-魔法
+  uint32 stream_effect_id = 17;  // 流光特效Id（具体配置通过GetGiftEffect拉取）
+  uint64 time_stamp = 18;  //赠送时间
+  string room_name = 19;   //房间名称
+  string msg = 20;  // 祝福语
+  SendGiftType send_type = 23;//送礼类型 1 视频通话送礼
+  int64 charm_level = 26;//发送者魅力等级
+  sint64 sndId2 = 27;//发送者靓号
+  bool is_new_player = 29;//是否新用户
+  common.GuildNameplate guild_nameplate = 30; // 公会铭牌
+  // vip等级
+  int32 vip_level = 31;
+  // 合伙人头衔
+  string sub_guild_medal = 32;
+  int64  combo = 33;
+  int64 combo_gold = 34;
+  // 送礼物人的性别
+  common.SexType sex = 35;
+  // 跑马灯特效Id（具体配置通过GetGiftEffect拉取）
+  uint32 marquee_effect_id = 36;
+  // 跑马灯显示范围（0:不展示 1:只在房间内 2:任何页面）
+  uint32 marquee_show_scope = 37;
+  //uint32 prank_gift = 38; // 是整蛊礼物
+  bool open_mystery = 38; // 送礼人是不是神秘人
+  bool receive_open_mystery = 39; // 收礼人是并不是神秘人
+  // 送礼人的特权
+  repeated common.Effect effects = 40;
+}
+
+message GiftConfigReq {
+}
+
+message GiftConfigRes {
+    repeated GiftConfigItem gifts = 1;
+    repeated NewUserGiftItem dayOne = 2;
+    repeated NewUserGiftItem dayTow = 3;
+    repeated NewUserGiftItem dayThree = 4;
+    repeated NewUserGiftItem firstCharage = 5;
+    repeated GiftClassify classify_list = 6;    //分类数据
+}
+
+message GiftRoomGiftReq {
+    sint64 room_id = 1;
+}
+message GiftRoomGiftRes {
+    sint64 room_id = 1;
+    repeated int32 list = 2;     //礼物列表
+}
+
+//message GiftDynamic{
+//  GiftDynamicType type = 1;
+//  uint32 gift_id = 2;
+//  string url =  3;
+//  uint32 val1 = 4;
+//  uint32 val2 = 5;
+//  uint32 val3 = 6;
+//  string str1 = 7;
+//  string str2 = 8;
+//  string str3 = 9;
+//}
+
+//动态礼物协议
+//message GiftDynamicReq {
+//}
+//message GiftDynamicRes {
+//  repeated GiftDynamic list = 1;
+//}
+
+//message TransferGiftReq {
+//	sint64 to_id = 1; // 被赠送者id
+//	uint32 gift_entry = 2; // 礼物id
+//   	uint32 gift_num = 3;
+//}
+
+//message TransferGiftRes {
+//    	bool   flag = 1;	// true是否成功
+//	sint64 to_id = 2; // 被赠送者id
+//	uint32 gift_entry = 3; // 礼物id
+//   	uint32 gift_num = 4;
+//}
+
+// 魔法广播礼物消息房间
+message MagicGiftBroadcast {
+	sint64 id = 1;	// 发送者id
+	string name =2; // 发送者名称
+	uint32 gift_id = 3;	// 礼物id
+    uint32 gift_num = 4;
+    string receive_name = 5;  // 接收者名称
+    sint64 receive_id = 6;  // 接收者id
+	int32 effect_id = 7;	// 特效Id
+    string effect_name = 8;
+	repeated int32 timeout = 9;	// 结束时间 [年,月, 日, 时, 分, 秒]
+    // 发送者爵位信息
+    //RoomNobilityInfo send_nobility = 10;
+    // 接受者爵位信息
+    //RoomNobilityInfo receive_nobility = 11;
+}
+
+message GetGiftChangeNoticeReq {
+}
+
+message GetGiftChangeNoticeRes {
+}
+
+
+message BuyGiftReq {
+    sint32 gift_id = 1;
+    sint32 amount = 2;
+}
+message BuyGiftRes {
+}
+
+message GiftInsertItem {
+  string icon = 1;
+  string name = 2;
+  string desc = 3;
+  int32 position = 4;
+  string jump = 5;
+}
+
+message GiftClassify{
+    int32 id = 1; // 类别id
+    string name = 2; // 类别名称
+    int32 sort =  3; // 权重
+    bool is_bag = 4; // 是否在背包显示
+    bool is_default = 5; // 是否默认显示的分类
+    GiftShowPlace show_place = 6; // 显示地方
+    // 第一次打开前是否有红点
+    bool have_red = 7;
+    // 分类banner
+    string banner_url = 8; //标题页面 H5地址 @since V1.4.0
+    // 在当前分类中插入一些模块
+    repeated GiftInsertItem gift_insert_items = 9;
+}
+
+enum GiftShowPlace {
+    None = 0;      // 占位
+    Room = 1;      // 房间
+    Im = 2;        // im
+}
+
+message GiftBox {
+    int32 gift_id = 1; 				// 礼物id
+    string gift_name = 2;			// 礼物名称
+    int32 gift_num = 3;				// 礼物数量
+}
+
+// 广播ID 400103
+message GiftComboEndNotify{
+  int64  player_id = 1;
+  string nick = 2;
+  string icon = 3;
+  int64  gift_id = 4;
+  int64  combo_num = 5;
+  int64   combo_gold = 6;
+  repeated common.Effect effect = 7; //发送者身上佩戴的特权
+  bool isNewPlayer = 8;//是否新用户
+  common.GuildNameplate guild_nameplate = 9; // 公会铭牌
+  // vip等级
+  int32 vip_level = 10;
+  // 合伙人头衔
+  string sub_guild_medal = 11;
+  int64 receiver_id = 12; // 礼物接收者ID
+  string receiver_nick = 13; // 礼物接收者昵称
+  string receiver_icon = 14; // 礼物接收者头像
+  int64 gift_num = 15; // 礼物数量
+  uint32 wealth_level = 16;
+  int64 charm_level = 17;//发送者魅力等级
+  common.SexType sex = 18; //性别
+  common.SexType receiver_sex = 19; //礼物接收者头像性别
+  string PrankEnumContent = 20;  // 整蛊菜单内容
+  int64 gift_total = 21; // 礼物总数量（新版，不用和gift_num相乘）
+  bool open_mystery = 22; //是否是神秘人
+  bool receive_open_mystery = 23; //接收者是否是神秘人
+}
+
+service GiftExtObj_gift {//12000 ---- 12100
+  rpc Present_12000 (GiftPresentReq) returns (GiftPresentRes);                    // 普通赠送
+  rpc BatchPresent_12001 (GiftBatchPresentReq) returns (GiftPresentRes);           // 批量赠送
+  rpc GetGiftConfig_12002 (GiftConfigReq) returns (GiftConfigRes); 	// 获取礼物配置
+  //rpc GetGiftDynamic_12005 (GiftDynamicReq) returns (GiftDynamicRes);   // 获取动态礼物信息
+  rpc GetRoomGift_12007 (GiftRoomGiftReq) returns (GiftRoomGiftRes); 	// 房间礼物
+  //购买礼物
+  rpc BuyGift_12009 (BuyGiftReq) returns (BuyGiftRes);
+}
+

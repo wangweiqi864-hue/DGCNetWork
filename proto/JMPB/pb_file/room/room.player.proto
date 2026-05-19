@@ -1,0 +1,64 @@
+syntax = "proto3";
+package live;
+import "common/common.proto";
+// import "room/room.type.proto";
+
+// 场景玩家信息
+message LivePlayer {
+  sint64 id = 1;
+  string name = 2;
+  string icon = 3;        // 资源版本号
+  int32 wealth_level = 4; // 财富等级
+  int32 charm_level = 5;  // 魅力等级
+  sint64 id2 = 6;         // 靓号
+  // OnlineStateType online_state = 7;
+  common.RoomAdminType admin_type = 8;
+  uint32 create_at = 9; // 注册时间
+  // sint64 flags = 10; // 标志，按位存储。各位表示意思参考PlayerFlags
+  // sint64 flags2 = 11; // 标志，按位存储。各位表示意思参考PlayerFlags2
+  // bool is_charge = 13;
+  sint64 forbid_speak_time = 14; //禁言时间
+
+  bool seat_ban_speak = 15; // 坑位发言状态，0开麦/1禁麦 （房主/管理员设置）
+  bool seat_speak_onoff = 16; // 玩家坑位发言开关 0关/1开
+  bool accompany_onoff = 17;   // 伴奏开关 0关/1开
+  bool sound_onoff = 18;       // 声音开关 0关/1开
+  common.SexType sex = 19;            // 性别
+  repeated common.Effect effect = 20; //特效
+  // 坑位摄像头状态 0开/1禁 （房主/管理员设置）
+  bool seat_ban_camera               = 21;
+  // 在线经验
+  uint32 online_exp                   = 24;
+  // 是否新人
+  bool is_new_user                    = 32;
+  // vip等级
+  int32 vip_level                     = 33;
+  // 是否匿名
+  bool is_anon                        = 34;
+  // 摄像头是否打开
+  bool is_camera_on = 58;
+  //是否保留视频位
+  bool keep_video_display             = 59;
+  // 进房来源
+  int32 enter_from = 60; // 1 推荐页房间
+  //用户计分器
+  int64 gift_value     = 61;
+  //cp_id
+  int64 cp_id = 62;
+  //用户权限能力
+  uint64 flag = 63;
+  // 是否佩戴了沙特国旗
+  bool saudi_flag =64;
+  // 沙特国旗图标
+  string saudi_flag_icon = 65;
+  // 是否开启神秘人功能
+  bool open_mystery = 67;
+}
+
+message QueryRoomPlayerAdminTypeReq {
+  int64 player_id = 1;
+}
+
+message QueryRoomPlayerAdminTypeRes {
+  common.RoomAdminType admin_type = 1;
+}

@@ -1,0 +1,297 @@
+syntax = "proto3";
+package live;
+// import "common/common.proto";
+import "room/room.type.proto";
+import "room/room.player.proto";
+import "room/room.pk.proto";
+
+// 嘉宾位状态
+enum SeatStatus {
+  CS_OPEN = 0;  // 空闲
+  CS_CLOSE = 1; // 关闭
+}
+
+// 嘉宾位
+message Seat {
+  sint32 id = 1; // 座位ID, 0到8， 0是房主位
+  SeatStatus status = 2;
+  LivePlayer player = 3; // 位置上的玩家
+  sint64 operator = 4;    // 操作者ID
+  int32 gold_level = 5;   // 帽子等级
+  int32 seat_charm = 6;  // 麦序魅力值
+  int32 seat_charm_rank = 7;//排名
+  bool muted = 8;           // 是否是静音状态，true为静音
+  int64 cp_id = 9;
+}
+
+enum ClearSeatType {
+  CCT_ZERO = 0; // 占位不用
+  CCT_CLEAR_Seat = 1; // 清空座位
+}
+
+// 请求下座
+message SeatLeaveReq {
+  sint64 target_id = 2; // 下座目标id
+  sint32 Seat_id = 3;  // 座位ID
+  ClearSeatType opt_type = 4;
+}
+
+
+message SeatLeaveRes {
+//  AgodaKey agoda_key = 2; // 声网key
+}
+
+
+// 移麦
+message SeatMoveReq {
+  sint32 from_Seat_id = 2;
+  sint32 to_Seat_id = 3; // 移到位置
+}
+message SeatMoveRes {}
+
+
+enum SitSeatType {
+  // 普通上麦
+  SCT_NormalSit = 0;
+  // 匿名上麦
+  SCT_MaskSit = 1;
+  // 遵循上一次，后台用
+  SCT_FollowLast = 2;
+  //移动类型
+  SCT_MOVE = 3;
+}
+
+// 请求上麦
+message SeatSitReq {
+  //麦位Id
+  int32 Seat_id = 1;
+    //上麦来源 0:正常上麦 1:邀请上麦
+  int32 source = 2;
+}
+
+message SeatSitRes {
+//  AgodaKey agoda_key = 2; // 声网key
+}
+
+
+
+
+// cmdId=100102, 广播嘉宾位状态变更
+message BroadcastSeatStatus {
+  sint32 Seat_id = 1; // 座位ID
+  SeatStatus status = 2;
+}
+
+// cmdId=100110, 广播嘉宾位玩家变更
+message BroadcastSeat {
+  sint32 Seat_id = 1; // 座位ID
+  Seat Seat = 2;
+  int64  roomId = 3; // 房间id; 之前的逻辑默认0
+}
+
+// 通知 上座者收到 cmdId=100111,
+message BroadcastSeatSit {
+  sint64 operator_id = 1; // 操作者id
+  sint64 target_id = 2;   // 上座目标id
+  sint32 seat_id = 3;    // 座位ID
+}
+
+
+// cmdId=100113 通知 下座者收到
+message BroadcastSeatLeave {
+  sint64 operator_id = 1; // 操作者id
+  sint64 target_id = 2;   // 下座目标id
+  sint32 Seat_id = 3;    // 座位ID
+}
+
+// cmdId=100104, 广播禁麦/开麦
+message BroadcastSeatSpeak {
+  sint64 target_id              = 1;      // 目标id
+  bool Seat_ban_speak           = 2;      // 坑位发言状态，0开/1禁
+  SeatSetType device           = 3;      //坑位设备类型 0麦1摄像头
+  string target_name            = 4;      // 目标名字
+  int64 operator_id             = 5;      // 操作者Id
+  string operator_name          = 6;      // 操作者名字
+}
+
+// cmdId=Seat 广播移麦
+message BroadcastSeatMove {
+  sint64 player_id = 1;
+  sint32 from_Seat_id = 2;
+  sint32 to_Seat_id = 3; // 移到位置
+  int32 Seat_charm = 4;  // 麦序魅力值
+  int32 Seat_charm_rank = 5;  // 麦序排行
+  int64 cp_id = 6; // 移麦者的cp_id
+}
+
+
+// 设置坑位发言开关
+message SeatSpeakOnOffReq {
+  SeatSetType device    = 1;
+  bool Seat_speak_onoff  = 2; // 坑位发言状态，
+}
+
+message SeatSpeakOnOffRes {}
+
+// cmdId=100105, 广播设置坑位发言开关
+message BroadcastChairSpeakOnOff {
+  sint64 target_id = 1; // 目标id
+  bool Seat_speak_onoff = 2;
+}
+
+// 邀请上麦
+message InviteChairReq {
+  int64 player_id = 1;  // 被邀请人
+  int32 chair_id = 2;   // 麦位Id（-1表示未指定麦位）
+}
+
+message InviteChairRes {
+
+}
+
+//cmd：110006
+message InviteChairNotify {
+  int64 inviter_id = 1;
+  string inviter_name = 2;
+  InviteChairReq req = 3;
+}
+
+message KickChairReq {
+  int64 player_id = 1;  // 被踢的人
+}
+
+message KickChairRes {
+
+}
+
+// cmd：110007
+message KickChairNotify {
+  int64 operator = 1;
+  string operator_name = 2;
+  int64 player_id = 3;
+  int32 chair_id = 4;
+}
+
+// cmd: 30020 静音麦位
+message MuteChairReq {
+  int32 chair_id = 1;
+  bool muted = 2;   //true表示静音
+}
+
+// 麦位锁定状态
+enum ChairLockStatus {
+  OPEN = 0;  // 打开状态
+  CLOSE = 1; // 锁定状态
+}
+
+message MuteChairRes {
+
+}
+
+//cmd 110008
+message MuteChairNotify{
+  int32 chair_id = 1;
+  bool muted = 2;
+}
+
+// cmd: 30021 锁定麦位
+message LockChairReq {
+  int32 chair_id = 1;      //-1 表示全部麦位
+  ChairLockStatus status = 2;
+}
+
+message LockChairRes {
+
+}
+
+// cmdId=110009, 广播麦位锁定状态变更
+message ChairLockStatusNotify {
+  repeated int32 chair_id = 1;
+  ChairLockStatus status = 2;
+    // 本次操作涉及到麦位上的用户（如果麦位上有人的话）
+  repeated int64 players = 3;
+}
+
+enum ChairQueueOpCode {
+  //占位
+  CQO_Zero              = 0;
+  //请求连麦
+  CQO_Request           = 1;
+  //同意连麦
+  CQO_AGREE             = 2;
+  //拒绝连麦
+  CQO_REFUSE            = 3;
+  //邀请连麦
+  CQO_INVITE            = 4;
+  //取消连麦
+  CQO_CANCEL            = 5;
+}
+
+message OptChairQueueExt {
+  // PK模式下申请要上的阵营
+  PkTeamName pk_team = 1;
+}
+
+// 连麦操作
+message OptChairQueueReq {
+  ChairQueueOpCode op = 1;
+  int64 player_id = 2;
+  OptChairQueueExt ext = 3;
+}
+
+message OptChairQueueRes {}
+
+enum ChairQueueCMD {
+  CQC_Zero              = 0;
+  //申请连麦
+  CQC_REQUEST       = 1;
+  //同意连麦
+  CQC_AGREE             = 2;
+  //拒绝连麦
+  CQC_REFUSE            = 3;
+  //邀请连麦
+  CQC_INVITE            = 4;
+  //取消连麦
+  CQC_CANCEL            = 5;
+  //管理员房主同步连麦数据
+  CQC_SYNC_Data         = 6;
+}
+
+// cmdId=100115, 连麦广播
+message BroadcastChairQueueOpt {
+  ChairQueueCMD cmd = 1;
+  // 队列人数
+  int64 queue_len = 2;
+  // 名称
+  string owner_name = 3;
+  //管理员或房主id
+  sint64 playerId   = 4;
+  //被操作者
+  sint64 targetId   = 5;
+}
+
+// 请求排麦列表
+message ChairQueueListReq {}
+
+message ChairQueueListRes {
+  repeated LivePlayer queue = 1;
+}
+
+message AcceptChairQueueReq {
+  // 1. 同意, 2. 拒绝
+  uint32 status = 1;
+  // 1. 打开, 2. 关闭
+  bool is_camera_on = 2;
+  // 扩展参数
+  // AcceptChairQueueExt ext = 3;  
+}
+
+message AcceptChairQueueRes {
+
+}
+
+//  100103 麦位发生变动广播麦位列表
+message BroadcastSeatQueue {
+  repeated Seat seats = 1;
+  int64 roomId = 2; // 房间Id; 之前的逻辑默认0
+}  

@@ -1,0 +1,107 @@
+syntax = "proto3";
+package live;
+import "room/room.pk.proto";
+
+message RocketConfig {
+    // 火箭等级
+    repeated RocketLevel levels = 1;
+    // 规则地址
+    string rule = 2;
+    // 火箭礼物Id
+    int64 gift_id = 3;
+  }
+  
+  message RocketLevel {
+    // 等级（1-5）
+    int32 level = 1;
+    // 完成该等级需要的积分
+    int64 score = 2;
+    // 奖励
+    repeated RocketReward rewards = 3;
+  }
+  
+  message RocketReward {
+    //奖励图标
+    string icon = 1;
+    //奖励描述
+    string desc = 2;
+  }
+  
+  message RocketLevelData {
+    // 是否已发射
+    bool launched = 1;
+    // 贡献榜前三名
+    repeated RankPlayer contrib_top_3 = 2;
+  }
+  
+  message RocketInfo {
+    // 火箭配置
+    RocketConfig config = 1;
+    // 火箭等级数据（key为等级）
+    map<int32, RocketLevelData> data = 2;
+    // 当前火箭等级
+    int32 current_level = 3;
+    // 当前等级分数
+    int64 current_level_score = 4;
+    // 当前进度（0-100,100表示完成）
+    int32 current_progress = 5;
+    // 是否全部火箭都已经发射
+    bool all_launched = 6;
+  }
+  
+  // 火箭贡献榜
+  message RocketContribRank {
+    repeated RankPlayer list = 1;
+  }
+  
+  enum RocketOperateCode {
+    RocketOpNone = 0;
+    // 查询房间火箭信息
+    RocketOpQueryInfo = 1;
+    // 查询房间火箭贡献榜
+    RocketOpQueryContribRank = 2;
+  }
+  
+  message RocketOperateReq {
+    // 操作类型
+    RocketOperateCode op_code = 1;
+    // 火箭等级（op_code=2的时候需要传）
+    int32 level = 2;
+  }
+  
+  message RocketOperateRes {
+    // op_code=1
+    RocketInfo info = 1;
+    // op_code=2
+    RocketContribRank contrib = 2;
+}
+
+enum RocketEventType {
+    RocketEventNone = 0;
+    //进度变更
+    RocketEventProgressChange = 1;
+  }
+  
+//cmd=110021
+message RocketNotify {
+  message LaunchedRocket {
+    // 等级
+    int32 level = 1;
+    // 特效
+    string effect = 2;
+    // 奖励名单（key为中奖用户,value为该用户中的奖励）
+    map<int64, RocketReward> rewards = 3;
+    // 未中奖的用户（在这个名单里的人需要弹未中奖名单）
+    repeated int64 losing_players = 4;
+  }
+
+  RocketEventType type = 1;
+  // 等级
+  int32 current_level = 2;
+  // 进度（0-100,100表示完成）
+  int32 current_progress = 3;
+  // 发射的火箭（可能回一次触发多个火箭）
+  repeated LaunchedRocket launched_rockets = 4;
+  // 当前等级分数
+  int64 current_level_score = 5;
+}

@@ -1,0 +1,106 @@
+syntax = "proto3";
+package live;
+import "common/common.proto";
+import "room/room.type.proto";
+// import "room/room.player.proto";
+
+
+enum PlayerRoomActionType {
+  NONE = 0;
+  ENTER_ROOM = 1;
+  SEND_CHAT_MESSAGE = 2;
+  //禁用摄像头
+  FB_CAMERA         = 3;
+  //禁用麦克风
+  FB_MICRO          = 4;
+}
+
+message ForbidRoomActionReq {
+  int64 player_id = 1;
+  int64 room_id = 2;
+  PlayerRoomActionType action = 3;
+}
+
+message ForbidRoomActionRes {
+
+}
+
+message UnforbidRoomActionReq {
+  int64 player_id = 1;
+  int64 room_id = 2;
+  PlayerRoomActionType action = 3;
+}
+
+message UnforbidRoomActionRes {
+
+}
+
+
+message QueryRoomActionForbidListReq {
+  int64 room_id = 1;
+  //页数，从1开始
+  int32 page = 2;
+  PlayerRoomActionType action = 3;
+}
+
+message RoomActionForbidRecord {
+  int64 player_id = 1;
+  string player_name = 2;
+  string player_icon = 3;
+  //开始时间，时间戳（秒）
+  int64 forbid_time = 4;
+}
+
+message QueryRoomActionForbidListRes {
+  repeated RoomActionForbidRecord list = 1;
+  bool has_next = 2;
+}
+
+message QueryRoomActionForbidStatusReq {
+  int64 room_id = 1;
+  repeated int64 player_ids = 2;
+}
+
+message QueryRoomActionForbidStatusRes {
+  //被禁用的行为
+  repeated PlayerRoomActionType actions = 1;
+}
+
+// cmd:110005
+message ForbidRoomActionNotify {
+  int64 room_id = 1;
+  int64 player_id = 2;
+  PlayerRoomActionType action = 3;
+}
+
+// 请求禁麦/开麦 禁/开摄像头
+message SeatSpeakReq {
+  SeatSetType device       = 1;  //设置设备类型
+  sint64 target_id          = 2;     // 目标id
+  bool seat_ban            = 3; // 坑位发言状态，0开/1禁
+}
+
+message SeatSpeakRes {}
+
+//管理员设置
+message SetRoomAdminReq {
+  sint64 to_player_id = 3; //
+  common.RoomAdminType admin_type = 4; // 设置管理员的类型(想要成什么身份就传什么身份的值)
+}
+
+message SetRoomAdminRes {
+  sint64 player_id = 2; // 当前设置管理员的操作用户
+  common.RoomAdminType admin_type = 3;
+}
+
+//通知管理员变更（房间广播，前端根据策划按要求提示）
+// 100046
+message BroadcastSetRoomAdmin {
+  sint64 room_id = 1;
+  sint64 manager_id = 2;   // 管理员ID
+  string manager_name = 3; // 管理员名称
+  sint64 player_id = 4;    // 玩家ID
+  string player_name = 5;  // 玩家名
+  common.RoomAdminType admin_type =
+      6; // 设置管理员的类型(想要成什么身份就传什么身份的值)
+}

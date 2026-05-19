@@ -1,0 +1,105 @@
+syntax = "proto3";
+package UserUploadCommon;
+
+// 上传类型
+enum PluginUploadType {
+  TypeZero = 0;
+  // 用户头像
+  HeadIconImg = 1;
+  // 个人动态图片
+  DynamicsImg = 2;
+  // 客户端日志
+  ClientLog = 3;
+  // 
+  TipOffsImg = 4;
+  // 私聊/公屏图片，(有生命周期，私聊消息需要前端保存在本地)
+  PMMedia = 5;
+  // 声音
+  Voice = 6;
+  // 反馈多张图片未登录
+  FeedBackImg = 7;
+  // 个人封面图
+  ZoneCover = 8;
+  // 举报
+  ReportImg = 9;
+  // 房间封面
+  RoomImg = 10;
+  // 群头像
+  GroupIcon = 11;
+  // 公会标识或头像
+  GuildIcon = 12;
+  // 活动新年
+  ActNewYear = 1000;
+  // 定制礼物
+  CustomGift = 1001;
+  // 自定义房间主题
+  PersonalizeDecorate = 1002;
+}
+
+message StsGetTokenReq {
+    PluginUploadType upload_type = 1;
+}
+
+message StsGetTokenRes {
+    FileInfo file = 2;
+    StsToken token = 1;
+    PluginUploadType upload_type = 3;
+}
+
+message StsToken {
+    string security_token = 4;
+    string access_key_secret = 3;
+    string access_key_id = 2;
+    string bucket_name = 5;
+    // 回调地址
+    string callback_url = 7;
+    string session_key = 8;
+    // 过期时间，unix
+    int64 expiration = 6;
+    // eg: http://oss-cn-shenzhen.aliyuncs.com
+    string endpoint = 9;
+}
+  
+message FileInfo {
+    // 文件名，不含文件类型后缀，eg: XXXXX
+    string file_name = 3;
+    // eg: upload/beta/dynamic/58F2/453E/58F2D5C51780BF45.png
+    string file_path = 2;
+    // 文件访问oss_cdn_host;
+    string file_cdn = 4;
+}
+
+//  oss上传回调:  Obj=whalesing.user.UserIntObj, Func=UresOssCallback
+message UresOssCallbackReq {
+    PluginUploadType type = 1;
+}
+message UresOssCallbackRes {
+}
+
+// 上传客户端日志
+message UploadClientLogReq {
+    string url      = 1;          //日志文件路径
+    string text     = 2;          // 说明 如果后台拉取：auto
+    string client_info      = 3;          // 客户端信息
+    string pic_url          = 4;//图片路径，多图片路径英文逗号分割
+}
+  
+message UploadClientLogRes {
+}
+
+// 删除图片
+message DeleteOssImageListReq {
+    int64 id = 1; // 相册图片id
+    PluginUploadType type = 2;
+    // string url = 3;  // 不要带cdn
+  }
+  message DeleteOssImageListRes {
+  }
+  
+//   // 保存上传图片
+//   message SaveOssImageListReq {
+//     PluginUploadType type = 1;
+//     repeated string url = 2;  // 不要带cdn
+//   }
+//   message SaveOssImageListRes {
+//   }

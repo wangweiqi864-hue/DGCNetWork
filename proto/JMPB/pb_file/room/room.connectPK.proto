@@ -1,0 +1,229 @@
+syntax = "proto3";
+package live;
+
+import "room/room.pk.proto";
+import "common/common.proto";
+import "room/room.type.proto";
+import "room/room.seat.proto";
+
+enum RoomBattleOptType{
+    // 连线
+    line = 0;
+    // pk
+    pk = 1;
+  }
+  
+  // pk推荐房间列表
+  message RoomBattleRoomListReq{
+    RoomBattleOptType optType = 1; // 0:连线 1:pk
+  }
+  message RoomBattleRoomListRes{
+    message Room{
+      int64  id = 1;        // 房间Id
+      string icon = 2;      // 房间图标
+      string title = 3;     // 房间标题
+      string nickname = 4;  // 房主昵称
+      int64 num = 5;      // 房间人数
+      string room_image = 6; //封面
+    }
+    repeated Room rooms = 1;
+  
+  }
+  
+  // pk邀请
+  message RoomBattleInviteReq{
+    int64  inviteId = 1;        // 邀请对方的Id
+    RoomBattleOptType optType = 2; // 0:连线 1:pk
+    bool cancel = 3; // true:取消
+  }
+  message RoomBattleInviteRes{
+    int64 remainTime = 1; // 邀请20秒
+  }
+  
+  // 被邀请用户收到,弹窗用  对应RoomCmdId:110025
+  message RoomBattleInviteInfo{
+    RoomBattleOptType optType = 1; // 0:连线 1:pk
+    int32 inviteOrMatch = 2; // 邀请类型:1直接邀请 2自动匹配邀请
+    int64 id = 3; // 邀请Id
+    string icon = 4;
+    string nickname = 5;
+    int64 num = 6;
+    int64 remainTime = 7; // 弹窗持续时间
+    bool cancel = 8; // true:取消
+    string cover = 9; // 房间封面
+    common.SexType sex = 10; // 性别
+
+    //声网key
+    common.AgodaKey agoda_key = 11;
+    string sdk_appid = 12; //语音sdk appid
+    VoiceSdkType sdk_type = 13;     // 声音sdk类型
+
+  }
+  
+  enum RoomBattleInviteType{
+    // 普通
+    normal = 0;
+    // 邀请开始
+    inviteStart = 1;
+    // 同意邀请
+    inviteAccept = 2;
+    // 拒绝邀请
+    inviteReject = 3;
+    // 主动取消邀请
+    inviteCancel = 4;
+    // 邀请超时
+    inviteTimeout = 5;
+    // 开始自动匹配
+    autoMatchStart = 6;
+    // 自动匹配成功
+    autoMatchSuccess = 7;
+    // 自动匹配失败
+    autoMatchFail = 8;
+    // 自动匹配取消
+    autoMatchCancel = 9;
+    // 失败
+    otherFail = 10;
+  }
+  
+  
+  // pk邀请状态推送 对应RoomCmdId:110026
+  message RoomBattleInvitePush{
+    int64 id = 1; // 邀请房间Id
+    RoomBattleInviteType inviteType = 2; //
+    RoomBattleOptType optType = 3;
+    int64 remainTime = 4; // 持续时间
+  }
+  
+  // 自动匹配
+  message RoomBattleMatchReq{
+    RoomBattleOptType optType = 1; // 0:连线 1:pk
+    int32 type = 2 ;  // 操作类型:1 匹配 2 取消
+  }
+  message RoomBattleMatchRes{
+    int64 remainTime = 1; // 自动匹配120秒
+  }
+  
+  // pk拒绝邀请
+  message RoomBattleRejectReq{
+    int64 id = 1;  // 用户id
+    int32 inviteOrMatch = 2;  // 邀请类型:1直接邀请 2自动匹配邀请
+  }
+  message RoomBattleRejectRes{
+  }
+  
+  // pk接受邀请
+  message RoomBattleAcceptReq{
+    int64 id = 1;  // 用户id
+    int32 inviteOrMatch = 2;  // 邀请类型:1直接邀请 2自动匹配邀请
+  }
+  message RoomBattleAcceptRes{
+  }
+  
+  enum RoomBattlePKStatus{
+    inNormal = 0;  // 普通状态
+    inPk = 1; // pk中
+    endPk = 2; // pk结束中
+    inCelebrate = 3;// 庆祝中
+  }
+  
+  
+  // 状态变化
+  enum RoomBattleCmdOptType{
+    cmdNormal = 0;  // 默认
+    PKStatusChange = 1; // pk状态改变
+    UpdateScore = 2; // 分数更新
+    UpdateMic = 3 ;  // 麦位状态更新
+    OtherDisconnect = 4 ;  // 1 一方调用连线断开
+  }
+  
+  // 请求pk相关信息
+  message RoomBattlePkInfoReq{
+    int64 roomId = 1; // 房间id(第三方查看用到, 默认0)
+  }
+  // 对应RoomCmdId:110027
+  message RoomBattlePkInfoRes{
+    int64 remainTime = 1; // 阶段剩余时间
+    int64 score1 = 2; // 我的分数
+    int64 score2 = 3; // 对方分数
+  
+    repeated RankPlayer rank1 = 4;  // 前3
+    repeated RankPlayer rank2 = 5;   // 前3
+  
+    //  RoomBattleOptType optType = 6; // 0:连线 1:pk
+    RoomBattlePKStatus pkStatus = 7; // pk状态
+    RoomBattleCmdOptType cmdOptType = 8; // 广播推送时的操作
+  
+    OtherRoomInfo otherRoomInfo = 9;
+
+    int64 pkId = 10;  // pk唯一Id
+  
+    message OtherRoomInfo{
+      bool isCloseOtherMic = 1; // 是否关闭麦克风 true:关闭 false:打开
+      int64 roomId = 2; // 房间id
+      string icon = 3; // 头像
+      string nickName = 4; // 昵称
+      //声网key
+      common.AgodaKey agoda_key = 5;
+      string sdk_appid = 6; //语音sdk appid
+      VoiceSdkType sdk_type = 7;     // 声音sdk类型
+  
+      repeated Seat seats = 8;            // 嘉宾位列表
+    }
+  }
+  
+  
+  
+  message RoomBattlePkHistoryReq{
+  }
+  message RoomBattlePkHistoryRes{
+    repeated PkHistory list = 1;
+  }
+  
+  message PkHistory{
+    int64 pkId = 1; // pk唯一Id
+  
+    string icon1 = 2; // 房主头像
+    string nickname1 = 3; // 房主昵称
+    int64 score1 = 4; // 分数
+    int64 playerId1 = 5;
+  
+    string icon2 = 6; // 房主头像
+    string nickname2 = 7; // 房主昵称
+    int64 score2 = 8; // 分数
+    int64 playerId2 = 9;
+  
+    int64 time = 10; // 时间
+  }
+  
+  // 取消pk
+  message RoomBattleCancelPkReq{
+    int32 cancelType = 1; // 1结束连线 2结束pk 3结束直播
+  }
+  
+  message RoomBattleCancelPkRes{
+  }
+  
+  // 开始pk
+  message RoomBattleStartPkReq{
+    int32 startType = 1;// 1连线 2再来一局
+  }
+  
+  message RoomBattleStartPkRes{
+  }
+  
+  // 关闭对方的声音
+  message RoomBattleCloseMicReq{
+    bool isCloseOtherMic = 1; // true:关闭 false:打开
+  }
+  message RoomBattleCloseMicRes{
+  }
+  
+  // 获取pk贡献榜单
+  message RoomBattlePkHistoryRankReq{
+    int64 pkId = 1; // pk唯一Id, 大于0查询历史, 0表示当前
+    int64 roomId = 2; // 对方id
+  }
+  message RoomBattlePkHistoryRankRes{
+    RankPlayerList rank = 1;
+    PkHistory pkHistory = 2;
+  }

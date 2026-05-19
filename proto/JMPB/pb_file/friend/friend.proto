@@ -1,0 +1,230 @@
+syntax = "proto3";
+package friend;
+import "common/common.proto";
+
+
+// cmdid＝ 200301;
+message AIChatAnswerNotice {
+    AIChatMessage message = 1; // 忽略AIChatMessage的query字段
+}
+
+message QueryAIChatConfigReq {
+
+}
+
+message QueryAIChatConfig {
+    string bot_id = 1;      //AI机器人Id
+    string background = 2;  //背景图
+    string intro = 3;       //简介
+}
+
+message QueryAIChatConfigRes {
+    QueryAIChatConfig config = 1;
+}
+
+message SendAIChatMessageReq {
+    string bot_id = 1;       // AI机器人Id，由QueryAIChatConfig接口返回
+    string text = 2;         // 发送的消息文本
+}
+
+message SendAIChatMessageRes {
+
+}
+
+message QueryAIChatMessageReq {
+    string bot_id = 1;       // AI机器人Id，由QueryAIChatConfig接口返回
+    string first_id = 2;     // 当前页第一条聊天记录的ID，传空表示最新记录
+    int32 limit = 3;         // 一次请求返回多少条聊天记录，默认20 条
+}
+
+message AIChatMessage {
+    string id = 1;
+    string query = 2;
+    string answer = 3;
+    int64  created_at = 4;   //时间戳（秒）
+}
+
+message QueryAIChatMessageRes {
+    bool has_more = 1; //是否存在下一页
+    repeated AIChatMessage messages = 2;
+}
+
+//好友列表
+message FriendListReq {
+    FriendType type = 1; //
+}
+
+message FriendListRes {
+    repeated Friender list = 1;
+}
+
+enum OperType {
+    NONE2001 = 0; //占位
+    FOLLOW = 1; // 关注
+    UNFOLLOW = 2; //取消关注
+    BLOCK = 3; //屏蔽用户
+    UNBLOCK = 4; //取消屏蔽
+}
+
+// 好友类型：
+enum FriendType {
+    FT_STRANGER = 0; // 陌生人
+    FT_BAN = -1; // 屏蔽
+    FT_FOLLOW = 1; // 关注
+    FT_FRIEND = 2; // 好友（互关）
+    FT_FOLLOW_FRIEND = 3; //关注加互粉(未用)
+    FT_MYSELF = 4; //自己
+    FT_Fans = 5; //粉丝(未用)
+}
+
+enum PrivacySettingOpt {
+  UCI_STAT_Zero = 0;
+  // 所有人
+  UCI_STAT_All = 1;
+  // 相互关注
+  UCI_STAT_Friend = 2;
+  // 我关注的
+  UCI_STAT_MyFollow = 3;
+  // 拒绝私信
+  UCI_STAT_Close = 4;
+}
+
+message Friender {
+    uint64 id = 1;
+    int32 type = 2; // [default=FT_STRANGER];
+    string alias = 3; // 备注名
+    string name = 4;
+    int32 sex = 5;
+    string icon = 6;
+    sint64 created = 8; // unix time
+    sint64 flag = 9; // PlayerFlags
+    bool online = 10;
+    int32 oper_type = 11;  //操作类型
+    int32 room_id = 12; //好友所在房间
+    string signature = 13; //签名
+    uint64 id2 = 14; // 靓号
+    //AppId  app_id = 15; // 应用Id
+    int32 wealth_level = 16; //财富等级
+    int32 charm_level = 17; //魅力等级
+    string room_name = 18;
+    repeated common.Effect effect = 19; // 用户特权
+    bool red_dot = 20;    // 红点标志
+}
+
+//关注 屏蔽等操作
+message FriendOperReq {
+    uint64 id = 1;
+    OperType oper = 2;
+}
+
+message FriendOperRes {
+    Friender friend = 1;
+}
+
+//批量关注 屏蔽等操作
+message FriendBatchOperReq {
+    repeated int64 player_id = 1;
+    OperType oper = 2;
+}
+
+message FriendBatchOperRes {
+    repeated Friender friend = 1;
+}
+
+message GetFriendRelReq {
+    int64 player_id = 1; // 玩家Id
+    int64 target_id = 2; // 对象Id
+}
+
+message GetFriendRelRes {
+    FriendType friend_type = 1; // 好友关系
+}
+
+message FansListReq {
+    int32 index = 1; //请求第一页时传0
+}
+
+message FansListRes {
+    repeated Friender list = 1; //一次最多返回50条记录
+    int32 current_index = 2; //客户端请求的 index
+    int32 next_index = 3; //-1代表列表没有下一页了, 否则可以用此值在FansListReq中请求下一页
+}
+
+//获取关注信息
+message FriendIdType{
+    int64 friendId = 1; // 好友id
+    FriendType type = 2;
+}
+
+message CheckFReq{
+    repeated int64 friendId = 1;
+}
+
+message CheckFRes {
+    repeated FriendIdType idType = 1;
+}
+
+message UserPrivateSettingReq {
+    PrivacySettingOpt options_setting             = 1; //1：所有人 2：关注后
+
+}
+
+message UserPrivateSettingRes {
+    PrivacySettingOpt options_setting             = 1;//设置结果
+}
+
+message QueryPrivateSettingReq {
+    sint64 target_playerId                          = 1;//读他人id 可为0
+}
+
+message QueryPrivateSettingRes {
+    PrivacySettingOpt private_options                  = 1;//设置
+    PrivacySettingOpt my_options                       = 2;//自己的设置
+}
+
+message QueryChatReplayReq {
+    //聊天对象
+    int64 toId              = 1;
+}
+
+enum ReplayStatus {
+    RS_NONE = 0; //占位不用
+    RS_ALL = 1; //自由聊天
+    RS_SelfNoReplay = 2; //自己没回复过对方
+    RS_TargetNoReplay = 3; //对方没回复过自己
+}
+
+message QueryChatReplayRes {
+    ReplayStatus replay                     =1;
+}
+
+
+// 同步红点数量 200206
+message FriendRedDotRes {
+    int64 friendRedDotNum = 1;
+    int64 followersRedDotNum = 2;
+}
+
+// 客户端主动清除红点
+message FriendClearRedDotReq {
+    FriendType ftype = 1;
+}
+
+message FriendClearRedDotRes {
+
+}
+
+
+// ***************  挚友商城  end   ****************
+//service FriendExtObj_friend {
+//
+//   // 查询AI聊天配置
+//    rpc QueryAIChatConfig_70042(QueryAIChatConfigReq) returns(QueryAIChatConfigRes);
+//    // 发送AI聊天消息
+//    rpc SendAIChatMessage_70043(SendAIChatMessageReq) returns(SendAIChatMessageRes);
+//    // 查询AI聊天消息
+//    rpc QueryAIChatMessage_70044(QueryAIChatMessageReq)returns(QueryAIChatMessageRes);
+//     //查询回复状态
+//    rpc QueryChatReplay_70045(QueryChatReplayReq) returns (QueryChatReplayRes);
+//}
+

@@ -1,0 +1,102 @@
+syntax = "proto3";
+package pay;
+
+// 内购配置
+message RechargeIap {
+    //平台 ios google
+    string platform = 3;
+    //内购产品id
+    string product_id = 1;
+    //充值金额
+    float money = 5;
+    //包名
+    string package_name = 2;
+    //名称或说明
+    string name = 4;
+    //充值的金币数
+    int32 gold = 6;
+    //额外加送金币
+    int32 ext_gold = 7;
+}
+  
+// 获取内购列表
+message IapListReq {
+    //包名
+    string package_name = 1;
+    //平台 ios google
+    string platform = 2;
+}
+  
+message IapListRes {
+    // 内购配置
+    repeated RechargeIap conf_recharge_iap_list = 1;
+}
+
+// 创建订单
+message CreateOrderReq{
+    string package_name = 1;
+    string product_id = 2;
+}
+message CreateOrderRes{
+    string order_id = 1;
+    // 是否限制了充值
+    bool is_limited = 2;
+    // 通知
+    Notice notice = 3;
+    message Notice {
+      // 弹窗标题
+      string title = 1;
+      // 弹窗内容
+      string content = 2;
+      // 跳转链接(比如：wh://open?dynamic=300&path=(room?id=10006698)）
+      string url = 3;
+      // 按钮上的文案
+      string button_str = 4;
+    }
+}
+
+message VerifyIAPReq {
+    //交易id
+    string transactionId = 3;
+    //账号
+    int64 accountId = 1;
+    //订单号，可能为空，如果为空后台则找到
+    string order_no = 4;
+    //票据
+    string receipt = 2;
+    //包名
+    string package_name = 5;
+    //订单ID是否来自苹果回调：false：程序内存中 true：苹果回调中
+    bool order_source = 6;
+}
+  
+message VerifyIAPRes {
+    repeated float money = 1;
+    string currency = 2;
+}
+
+// 金钱资产
+message AssetsMoneyReq {
+}
+
+message AssetsMoney {
+  int32 gold = 1;            //金币
+//   uint32 silver = 2;            //银币，暂时没有用
+  uint32 gift_ticket = 3;            //钻石
+  uint32 charge = 4;            //累计金额
+}
+
+// 金钱资产返回
+message AssetsMoneyRes {
+  uint32 flag = 1;            //1请求返回，2推送
+  AssetsMoney money = 2;
+}
+
+message TicketChangCoinReq {
+    sint32 diamond = 1;
+    string passwd = 2;
+}
+  
+message TicketChangCoinRes {
+    // errCode 33024 钻石不足; 33029 提现密码不正确; 33018 失败;
+}

@@ -1,0 +1,194 @@
+syntax = "proto3";
+package vip;
+
+service GrowthExtObj {
+  rpc UserVipInfo_81001(UserVipInfoReq) returns(UserVipInfoRes); // 用户vip信息
+  rpc BuyVip_81002(BuyVipReq) returns(BuyVipRes);
+  rpc UserAnonSettingList_81003(UserAnonSettingListReq) returns(UserAnonSettingListRes);
+  rpc UserAnonSetting_81004(UserAnonSettingReq) returns(UserAnonSettingRes);
+}
+
+
+message UserAnonSettingListReq {
+}
+
+message UserAnonSettingListRes {
+  repeated UserAnonSettingItem List = 1;
+}
+
+message UserAnonSettingItem {
+  UserAnonSettingType setting = 1;
+  bool stat = 2;
+}
+
+enum UserAnonSettingType {
+  UserAnonSettingType_Zero = 0;
+  // 防t
+  UserAnonSettingType_Prevent_T = 1;
+  // 神秘人
+  UserAnonSettingType_Mystery_Person = 2;
+  // 上线全服通知
+  UserAnonSettingType_Online_Notice = 3;
+  // 隐身
+  UserAnonSettingType_Invisible = 4;
+}
+
+message UserAnonSettingReq{
+  UserAnonSettingType setting = 1;
+  bool stat = 2;
+}
+
+message UserAnonSettingRes{
+
+}
+
+message UserVipInfoReq {}
+
+message UserVipInfoRes {
+
+  // vip等级卡片
+  repeated VipInfo List = 2;
+  // 用户昵称
+  string Nickname = 3;
+  // 用户头像
+  string Icon = 4;
+  // 用户等级
+  int64 VipLevel = 5;
+  // 到期时间
+  int64 VipLevelEndTime = 8;
+  // vip
+  int64 VipTasteLevel = 9;
+  // vip体验剩余时长，单位秒
+  int64 VipTasteLevelEndTime = 10;
+}
+
+message VipInfo {
+  // 等级
+  int64 VipLevel = 1;
+  // 主页勋章
+  string Medal = 2;
+  // 勋章静态图
+  string MedalStatic = 3;
+  // 主页背景
+  string Background = 4;
+  // 等级所需金币
+  int64 Gold = 5;
+  // vip特权列表
+  repeated VipPrivilegeItem List = 6;
+  // 身份标识
+  string Identity = 7;
+  // 角标
+  string CornerMark = 8;
+  // 进场背景 (英语）
+  string EnterBackground = 9;
+  // 升级背景（英语）
+  string UpgradeBackground = 10;
+  // 上线背景
+  string OnlineBackground = 11;
+  // 进场背景（阿语）
+  string EnterBackgroundAr = 12;
+  // 升级背景（阿语）
+  string UpgradeBackgroundAr = 13;
+   // 礼物角标
+  string GiftCornerMark = 14;
+  // 特权背景
+  string PriBackground = 15;
+  // vip标签
+  string VipLabel = 16;
+  // vip名称
+  string VipName = 17;
+  // isBuy
+  bool IsBuy = 18;
+   // 礼物流光
+  string GiftStreamer = 19;
+  // 在线房间列表背景
+  string OnlineListBg = 20;
+}
+
+message VipPrivilegeItem {
+  // id
+  int32 Id = 1;
+  // 名称（阿语）
+  string Name = 2;
+  // 描述（阿语）
+  string Desc = 3;
+  // icon
+  string Icon = 4;
+//  // 所属等级
+//  repeated int32 NeedLevel = 5;
+  // 权重
+  int32 Sort = 6;
+  // 是否关闭
+  bool IsClose = 7;
+  // 名称（英语）
+  string NameEn = 8;
+  // 描述（英语）
+  string DescEn = 9;
+  // 是否可点击，true可点击
+  bool OpenClick = 10;
+  // 说明图片
+  string DescPict = 11;
+}
+
+message VipConfReq{
+  string Md5 = 1;
+}
+
+message VipConfRes{
+  // 配置数据
+  repeated VipConf Conf = 1;
+  // 0:需要使用配置更新本地缓存;非0:不用更新
+  int32 Status = 2;
+  // 新的md5指纹
+  string Md5 = 3;
+}
+
+message VipConf {
+  // vip等级
+  int64 Level = 1;
+  // vip徽章
+  string Badge = 2;
+  // vip角标
+  string CornerMark = 3;
+  // vip进房动画
+  string EffectBg = 4;
+  // vip资料卡背景图
+  string CardBg = 5;
+  // vip资料卡顶部图
+  string CardTop = 6;
+}
+
+
+// 购买vip
+message BuyVipReq {
+  int64 VipLevel = 1;
+}
+
+message BuyVipRes {
+  int64  state = 1; // 0 成功, 1金币不足
+}
+
+enum GrowthCmdId {
+    GC_Unknown = 0;
+    // vip等级升级
+    GC_VipLevelUpgrade = 810001;
+    // vip等级降级
+    GC_VipLevelDowngrade = 810002;
+}
+
+// VipLevelUpgradeEvent vip等级升级事件。
+// cmdId = 810001
+message VipLevelUpgradeEvent {
+  int64 player_id = 1;
+  int32 vip_level = 2;
+  string nickname = 3;
+  string avatar = 4;
+}
+
+// VipLevelDowngradeEvent vip等级降级事件。
+// cmdId = 810002
+message VipLevelDowngradeEvent {
+  int64 player_id = 1;
+  // 降级后的当前vip等级
+  int32 vip_level = 2;
+}

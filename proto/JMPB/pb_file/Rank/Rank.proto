@@ -1,0 +1,113 @@
+syntax = "proto3";
+package Rank;
+
+import "common/common.proto";
+
+message Rank {
+  sint64 id = 1;
+  string name = 2;
+  common.SexType sex = 3;
+  sint32 level = 4;   // 财富、魅力等级 或 接单等级
+  sint64 value = 5; //财富或魅力值 或 接单数量
+  sint32 res_time = 6;
+  sint64 gap_val = 7;    // 差距值
+  string icon = 8;
+  sint64 gift_id = 9;   //礼物Id
+  sint32 gift_num = 10;    //总数
+  sint32 ranking = 11;  //排名 0是没有排名
+  sint64 id2 = 12; // 靓号
+  repeated common.Effect effect = 18; // 用户特权ID
+  string CC = 19;//国家代码/全大写两位英文
+  // vip等级
+  int32 vip_level = 20;
+  bool is_anon = 21;
+  sint32 goon_count   = 22;//连续同样排名次数
+  //是否开启神秘人
+  bool open_mystery = 23;
+}
+
+enum RankType {
+  RT_ZERO = 0;   // 占位，不使用
+  RT_CHARM = 1;   // 魅力榜
+  RT_WEALTH = 2;   // 财富榜
+  RT_ROOM  = 4;  //房间榜
+  RT_CONSTELLATION_CHARM  = 5;  // 星座魅力榜/伴侣榜
+  RT_CONSTELLATION_WEALTH = 6;  // 星座财富榜/星主榜
+  RT_VIDEO_CHARM = 7;  // 视频魅力榜
+}
+
+
+message RankDetail {
+    repeated Rank rank = 1; // 排行榜单
+    //请求用户参数所在排名
+    Rank my = 2;
+}
+
+//CmdId = 75000 
+message GetRankReq {
+    RankType type    = 1;
+    //用户ID
+    sint64 player_id = 2;
+    //房间ID
+    sint64 room_id   = 3;
+}
+
+
+message GetRankRes {
+    sint32 RankType = 1;  //  回传
+    RankDetail day = 2;   // 日榜
+    RankDetail week = 3;  // 周榜
+    RankDetail total = 4; // 总榜
+    RankDetail month = 5; //月榜
+    RankDetail hour  = 6; //小时榜
+}
+
+message GetRoomHourRankReq {
+    sint64 player_id = 1;
+}
+
+message GetRoomHourRankRes {
+    Rank last_top1      = 1; //上小时榜首
+    RankDetail hour     = 2; //小时榜
+}
+
+message GetRoomRankReq {
+  sint32 type = 1; //请求类型，2：财富，1：魅力
+  sint32 rank_flag =  2; //请求的周期榜标识，1：日榜，2：周榜，3：所以时间的累计榜
+}
+
+message GetRoomRankRes {
+  sint64 room_id = 1;
+  sint32 type = 2; //请求类型，2：财富，1：魅力
+  sint32 rank_flag = 3; //请求的周期榜标识，1：日榜，2：周榜，3：所以时间的累计榜
+  repeated Rank room_rank_list = 4; //日排行榜
+  uint64 total_value = 5;           //总的房间贡献值
+  Rank1 my_rank = 6; //我的排行榜
+}
+
+message Rank1 {
+  sint64 id = 1;
+  string name = 2;
+  common.SexType sex = 3;
+  sint32 wealth_level = 4;   // 财富等级
+  sint32 charm_level = 5;   // 魅力等级
+  sint64 Value = 6; //房间贡献值
+  sint64 gap_val = 7;    // 差距值
+  string icon = 8;
+  sint32 ranking = 9;  //排名 0是没有排名
+  sint64 id2 = 10; // 靓号
+  sint64 caiji_id = 11; // 菜鸡id
+  //马甲信息
+  //MaskInfo mask_info = 12;
+  repeated common.Effect effect = 13;
+  int32 vip_level = 14;
+}
+
+//cmdId = 110014
+message BroadCastRoomHourRank {
+  sint64 room_id              = 1;
+  //房间榜排名
+  int32 hour_rank_pos         = 2;
+  //差值
+  int32 hour_rank_value       = 3;
+}

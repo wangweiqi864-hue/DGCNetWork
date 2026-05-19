@@ -1,0 +1,558 @@
+syntax = "proto3";
+
+option objc_class_prefix = "PB3";
+
+package pb;
+import "common/common.proto";
+import "room/room.proto";
+enum LiveRoomPanelDataType {
+  LiveRoomPanelDataType_None = 0;
+  // 直播时长(单位秒)
+  LiveRoomPanelDataType_LiveDuration = 1;
+  // 总观看人数
+  LiveRoomPanelDataType_UniqueVisitor = 2;
+  // 新增关注
+  LiveRoomPanelDataType_FollowCount = 3;
+  // 钻石收入
+  LiveRoomPanelDataType_DiamondIncome = 4;
+  // 有效上麦新用户
+  LiveRoomPanelDataType_ValidSeatNewUser = 5;
+  // 有效在房新用户
+  LiveRoomPanelDataType_ValidRoomNewUser = 6;
+
+  //   直播下播页 新增
+  // 开始时间
+  LiveRoomPanelDataType_StartTime = 7;
+  // 结束时间
+  LiveRoomPanelDataType_StopTime = 8;
+  // 最高在线人数
+  LiveRoomPanelDataType_Pcu = 9;
+
+  // 进房人数
+  LiveRoomPanelDataType_EnterRoomCountNew = 10;
+  LiveRoomPanelDataType_EnterRoomCountAll = 11;
+  // 评论（发公屏）人数
+  LiveRoomPanelDataType_ScreenChatCountNew = 12;
+  LiveRoomPanelDataType_ScreenChatCountAll = 13;
+    // 人均停留时长
+  LiveRoomPanelDataType_StayRoomSecondAvgNew = 14;
+  LiveRoomPanelDataType_StayRoomSecondAvgAll = 15;
+    // 上麦人数
+  LiveRoomPanelDataType_OnMicCountNew = 16;
+  LiveRoomPanelDataType_OnMicCountAll = 17;
+  // 在房3分钟人数
+  LiveRoomPanelDataType_StayRoomThreeMinuteCountNew = 18;
+  LiveRoomPanelDataType_StayRoomThreeMinuteCountAll = 19;
+    // 在房3分钟人数
+  LiveRoomPanelDataType_GiftCountNew = 20;
+  LiveRoomPanelDataType_GiftCountAll = 21;
+
+
+  // 推荐页展示人数
+  LiveRoomPanelDataType_RecommendShowCountAll = 22;
+  // 推荐页进房人数
+  LiveRoomPanelDataType_RecommendEnterCountAll = 23;
+  // 推荐页进房率
+  LiveRoomPanelDataType_RecommendEnterRate = 24;
+}
+
+enum LiveRoomPanelDataGroupType {
+  LiveRoomPanelDataGroupType_None = 0;
+  // 实时数据
+  LiveRoomPanelDataGroupType_RealTimeData = 1;
+  // 考核数据
+  LiveRoomPanelDataGroupType_AssessmentData = 2;
+  // 结算数据
+  LiveRoomPanelDataGroupType_FinalData = 3;
+}
+
+message LiveRoomPanelDataGroup {
+  LiveRoomPanelDataGroupType type = 1;
+  repeated LiveRoomPanelDataItem list = 2;
+}
+
+message LiveRoomPanelDataItem {
+  LiveRoomPanelDataType type = 1;
+  string value = 2;
+}
+
+message QueryLiveRoomPanelDataReq {
+
+}
+
+message QueryLiveRoomPanelDataRes {
+  repeated LiveRoomPanelDataGroup list = 1;
+}
+
+message QueryLiveRoomFinalDataReq {
+}
+
+message QueryLiveRoomFinalDataRes {
+  repeated LiveRoomPanelDataGroup list = 1;
+}
+
+message PrankEnumInfo{
+  int64 gift_id = 1;
+  string gift_name = 2; // 更新的时候这个不用发
+  int64 gift_price = 3;
+  string content = 4;
+  string icon = 5; // 更新请求的时候这个不用发
+}
+
+message PrankEnumReq {
+  int64 playerId = 1; //房主id（|自己id透传）
+}
+
+message PrankEnumRes {
+  repeated PrankEnumInfo list = 1;
+  int64 OpenStatus = 2; // 0-未开启 1-开启
+  int64 PrankEnumLimitLen = 3;
+}
+
+message PrankEnumUpdateReq {  // 更新(开启时不可更新)
+  repeated PrankEnumInfo list = 1;
+
+
+}
+message PrankEnumUpdateRes {
+  int32 code = 1; // 0- 成功 1-菜单失效（谈提示即可，菜单服务端自动清除清除）
+}
+message PrankOptionReq {
+  int32 option = 1; // 1- 开启 2-关闭
+}
+
+message PrankOptionRes {
+   int32 code = 1; // 0- 成功 1-菜单失效（谈提示即可，菜单服务端自动清除清除）
+}
+
+enum RedEnvelopeType {
+  NORMAL = 0; // 占位
+  Gold = 1; // 金币福袋
+  Gift = 2; // 礼物福袋
+}
+
+message QueryRedEnvelopeConfReq {}
+
+message QueryRedEnvelopeConfRes {
+  repeated int32 bag_number_options = 1; // 福袋数量选项
+  repeated int32 period_options = 2; // 福袋有效期选项，单位分钟
+  repeated int32 gold_number_options = 3; // 金币数量选项
+  repeated int32 gift_number_options = 4; // 礼物数量选项
+  message GiftInfo {
+    string key = 1; // 礼物id
+    int32  price = 2; // 礼物单价（以金币计价）
+    string icon = 3; // 礼物图标
+  }
+  repeated GiftInfo gift_options = 5; // 礼物信息
+  bool is_open = 6; // 是否开启入口
+}
+
+// 福袋的金额/礼物分配方式
+enum AllocationType{
+  Average = 0; // 平均分配
+  Random =1; // 随机分配
+}
+
+// ClaimType 福袋领取范围
+enum ClaimType{
+  All = 0; // 所有人
+  OnMic = 1; // 仅限上麦用户领取
+}
+
+message SendRedEnvelopeReq{
+  RedEnvelopeType type = 1;
+  AllocationType allocation_type = 2;
+  int32 bag_number = 3; // 福袋数量
+  int32 bag_gold = 4; // 福袋金币，金币福袋时配置
+  string bag_gift_key = 5; // 福袋礼物，礼物福袋时配置
+  int32 bag_gift_num = 6; // 礼物数量，礼物福袋时配置
+  int32 period = 7; // 福袋有效期
+  string password = 8; // 福袋口令。服务端不设置默认口令，如果用户不设置，客户端也要把默认口令传过来
+  ClaimType claim_type = 9; // 福袋领取范围
+}
+
+message SendRedEnvelopeRes{
+  int32 code = 1; // 0-发送成功，1-金币不足，2-锁房状态不能发
+}
+
+message QueryRedEnvelopeSendReq{
+  // 分页查询
+  int64 page = 1;
+  int64 size = 2;
+}
+
+message QueryRedEnvelopeSendRes{
+  message Record{
+    int64 record_id = 1; // 送出记录id
+    RedEnvelopeType type = 2;
+    AllocationType allocation_type = 3;
+
+    int64 gold_total = 4; // 福袋金币总数（金币福袋时有效），不再使用
+    int64 gift_num = 7; // 礼物总数量（礼物福袋时有效），不再使用
+
+    string gift_key = 5; // 礼物key（礼物福袋时有效）
+    string gift_icon = 6; // 礼物icon（礼物福袋时有效）
+    int64 send_time = 8; // 送出时间，unix时间戳
+    int64 bag_total = 9; // 福袋总数
+    int64 received_bag = 10; // 已领取福袋数
+    int64 received_total = 11; // 被领取的总金币数/被领取的总礼物数
+  }
+  repeated Record records = 1;
+  int64 total = 2;
+}
+
+message QueryRedEnvelopeSendDetailReq{
+  int64 record_id = 1; // 送出记录id
+}
+
+message QueryRedEnvelopeSendDetailRes{
+  message ReceivedInfo{
+    int64 user_id = 1; // 领取人用户id
+    string nickname = 2; // 领取人用户昵称
+    string avatar = 3; // 领取人用户头像
+    string gift_key = 4; // 礼物key（礼物福袋时有效）
+    string gift_icon = 5; // 礼物icon（礼物福袋时有效）
+    int32 receive_amount = 6; // 领取的金币数/礼物数
+    int64 receive_time = 7; // 领取时间，unix时间戳
+  }
+  int64 user_id = 1; // 用户id
+  string nickname = 2; // 用户昵称
+  string avatar = 3; // 用户头像
+  string password = 4; // 领取口令
+  RedEnvelopeType type = 5;
+  AllocationType allocation_type = 6;
+  int32 bag_total = 7; // 福袋总数
+  int32 received_bag = 8; // 已领取福袋数
+  int32 received = 9; // 已领取金币数/礼物数
+  int32 total = 10; // 总的金币数/礼物数
+  repeated ReceivedInfo received_info = 11; // 领取情况
+}
+
+message QueryRedEnvelopeReceiveReq{
+  // 分页查询
+  int64 page = 1;
+  int64 size = 2;
+}
+
+
+// cmdId = 110030
+message ReceiveRedEnvelopeEvent{
+  RedEnvelopeType type = 1; // 福袋类型
+  string send_nickname = 2; // 发送者昵称
+  string receiver_nickname = 3; // 领取人用户昵称
+  int64 receive_amount = 4; // 领取到的金币数 or 礼物数
+  string gift_name = 5; // 礼物名称（礼物福袋时有效）
+  int64 receive_time = 6; // 领取时间
+}
+
+message QueryRedEnvelopeReceiveRes{
+  message Info{
+    string nickname = 1; // 发送者用户昵称
+    int64 receive_time = 2; // 领取时间，unix时间戳
+    RedEnvelopeType type = 3;
+    AllocationType allocation_type = 4;
+    string gift_key = 5; // 礼物key（礼物福袋时有效）
+    string gift_icon = 6; // 礼物icon（礼物福袋时有效）
+    int32 receive_amount = 7; // 领取的金币数/礼物数
+  }
+  repeated Info received_info = 1;
+  int64 total = 2;
+}
+
+message QueryAvailableRedEnvelopeReq{
+}
+
+message QueryAvailableRedEnvelopeRes{
+  message AvailableRedEnvelopeInfo{
+    int64 bag_id = 1; // 福袋id
+    int64 expiration = 2; // 结束倒计时（秒）
+    int64 sender_id = 3; // 福袋发送者id
+    string nickname = 4; // 福袋发送者昵称
+    string avatar = 5; // 福袋发送者头像
+    bool show = 6; // 是否显示发送人的头像和昵称
+  }
+  repeated AvailableRedEnvelopeInfo list = 1; // 可领取的福袋队列，最先过期的排在前面
+}
+
+message QueryRedEnvelopeInfoReq{
+  int64 bag_id = 1; // 福袋id
+}
+
+message QueryRedEnvelopeInfoRes{
+  int64 bag_id = 1; // 福袋id
+  int64 expiration = 2; // 结束倒计时（秒）
+  int64 sender_id = 3; // 福袋发送者id
+  string nickname = 4; // 福袋发送者昵称
+  string avatar = 5; // 福袋发送者头像
+  int32 bag_number = 6; // 福袋数量
+  int32 received_amount = 7; // 已领取数量
+  string password = 8; // 口令
+  ClaimType claim_type = 9; // 领取范围
+}
+
+message ReceiveRedEnvelopeReq{
+  int64 bag_id = 1; // 福袋id
+}
+
+message ReceiveRedEnvelopeRes{
+  message ReceiveInfo{
+    int64 receiver_id = 1; // 领取者id
+    string nickname = 2; // 领取人用户昵称
+    int64 receive_time = 3; // 领取时间，unix时间戳
+    int64 receive_amount = 4; // 领取的金币数/礼物数
+    string gift_key = 5; // 礼物key（礼物福袋时有效）
+    string gift_icon = 6; // 礼物icon（礼物福袋时有效）
+    string avatar = 7; // 领取人头像
+    string gift_name = 8; // 礼物名称（礼物福袋时有效）
+  }
+  int32 code = 1; // 1-领取成功 2-福袋已被领取完。福袋过期通过error返回
+  int64 sender_id = 2; // 发送者id
+  string nickname = 3; // 发送者昵称
+  string avatar = 4; // 发送者头像
+  int32 bag_total = 5; // 福袋数量
+  int32 received_bag_amount = 6; // 已领取的福袋数量
+  int64 available = 7; // 可领取的金币总数（或者是礼物总数）
+  int64 received = 8; // 已领取的金币数量（或者是礼物数量）
+  ReceiveInfo me = 9; // 我领取的福袋信息（如果福袋领取完，则返回空）
+  repeated ReceiveInfo list = 10; // 其他人的领取信息
+  RedEnvelopeType type = 11; // 福袋类型
+  AllocationType allocation_type = 12; // 福袋分配类型
+}
+
+//cmdid 110028
+message PrankEnumInfoPush {   // todo 注意，如果是后台关闭的话，只会返回这个，没有PrankOption_30089 返回
+  repeated PrankEnumInfo list = 1;
+  int64 OpenStatus = 2; // 0-未开启 1-开启
+}
+
+message QueryRoomHistoryPubMsgReq {
+}
+
+message QueryRoomHistoryPubMsg{
+  message Msg{
+    int32 cmd_id = 1;
+    bytes content = 2; // 对应cmdId的消息结构体，Protobuf序列化的二进制数据。客户端需要根据cmdId，使用Protobuf进行反序列化
+  }
+  repeated Msg msg = 1;
+}
+
+
+message UploadPersonalizeDecorateReq{
+  string name = 1;
+  string url = 2;
+}
+message UploadPersonalizeDecorateRes{
+
+}
+
+// PersonalizeDecorate 个性化主题资源
+message PersonalizeDecorate{
+  int64 id = 1;
+  string name = 2;
+  string url = 3;
+  int32 status = 4; // 审核状态。0-审核中，1-通过，2-不通过
+  int64 end_time = 5; //  结束时间戳，仅status==0时有效
+  bool is_use = 6; //是否在使用
+}
+
+message DelPersonalizeDecorateReq{
+  int64 decorate_id = 1;
+}
+message DelPersonalizeDecorateRes{
+
+}
+
+
+message SudGameManagerNewRes {
+
+}
+
+message StartScreenRecordingReq {
+  // 1: 截屏 2: 录屏
+  int32 type = 1;
+}
+
+message StartScreenRecordingRes {
+
+}
+
+// cmd=101112
+message ScreenRecordingEvent {
+  // 1: 截屏 2: 录屏
+  int32 type = 1;
+  // 操作用户
+  string nickname = 2;
+  // 操作用户Id
+  int64 player_id = 3;
+}
+
+//生日派对
+
+message MyInfoC{
+  int64 rank = 1;
+  string icon = 2;
+  string nickname = 3;
+  // 差值 距离 上一名 | 下一名 | 最后一名
+  int64 diff_score = 4;
+  int64 score = 5;
+  common.SexType sex = 6;
+  bool OpenMystery = 7;  // 是否神秘人
+}
+
+message RankItemC{
+  int64 rank = 1;
+  string playerName = 2;
+  string playerIcon = 3;
+  int64 score = 4;
+  common.SexType sex = 5;
+  bool OpenMystery = 6;  // 是否神秘人
+}
+
+// 生日派对开始界面
+message RoomBirthdayStartMainReq {
+}
+message RoomBirthdayStartMainRes {
+  int32 Count = 1;
+
+}
+
+// 生日派对开始
+message RoomBirthdayStartReq {
+  int64 ProtagonistId = 1;  // 咖位Id
+  int64 DurationHour = 2; // 小时
+}
+message RoomBirthdayStartRes {
+
+}
+
+// 生日派对主界面
+message RoomBirthdayMainReq {
+}
+
+message RoomBirthdayFloatBase {
+  string Icon = 1;
+  string Name = 2;
+  string Content = 3; // 内容
+  bool OpenMystery = 4;  // 是否神秘人
+  common.SexType Sex = 5;// 性别
+}
+
+//cmdId 101114
+message RoomBirthdayFloatPush {
+  RoomBirthdayFloatBase base = 1;
+  //  主咖信息
+  int64 ProtagonistId =2;
+  string ProtagonistName =3;
+  live.BroadcastChat chat = 4;   // 公屏消息
+}
+
+message RoomBirthdayMainRes {
+  int64 StartTime = 1;
+  int64 StopTime = 2;
+
+  //   咖位信息
+  string Name =3;
+  string Icon = 4;
+  int64 Id = 8; // playerId
+  common.SexType Sex = 9;// 性别
+  bool OpenMystery = 10;  // 是否神秘人
+
+  repeated RoomBirthdayFloatBase floatList = 5; // 飘屏列表
+  int32 floatCost = 6;  // 飘屏消耗
+  RoomBirthdayRankRes rank = 7; // 排行榜
+
+}
+
+// 生日派对排行榜
+message RoomBirthdayRankRes{
+  repeated RankItemC items = 1;
+  MyInfoC myInfo = 2;
+}
+
+// 生日派对结束
+message RoomBirthdayEndReq{
+}
+message RoomBirthdayEndRes{
+}
+
+//cmdId = 101113
+message RoomBirthdayEndInfo{
+  string Icon = 1;
+//  string FrameIcon = 2;
+  int64 StartTime = 3;
+  int64 stopTime = 4;
+  int64 Remain = 5; // 持续时间
+  int32 MaxOnline = 6;//最高在线人数
+  int32 FloatNum = 7; //付费飘屏数
+  int64 GiftGodNum = 8;//，收礼金币数
+  RoomBirthdayRankRes rank = 9; // 排行榜 todo 需要看个人数据？后面得看看
+  bool OpenMystery = 10;  // 是否神秘人
+  common.SexType Sex = 11;// 性别
+}
+
+// 生日派对-飘屏
+message RoomBirthdayFloatReq{
+  int64 RoomId = 1;
+  string content = 2;
+
+}
+message RoomBirthdayFloatRes{
+  repeated RoomBirthdayFloatBase floatList = 1; // 飘屏列表
+}
+
+message RoomBirthdayConfReq{
+
+}
+message RoomBirthdayConfRes{
+  repeated showPri priList = 1;
+  int32  FloatCost = 2; // 飘屏价格
+  repeated string FloatTmp = 3;  //祝福公屏(快捷语)
+  repeated string BlessingTmp = 5;  //祝福公屏(快捷语)
+  int32  OpenLimit = 6; // 开启次数限制
+  message showPri { // 1：房间背景 2：专属礼物 3：主播头像框 4：房间封面框 5：祝福飘屏
+    string Icon = 1;
+    string DescAr = 2;  // 阿语
+    string DescEn = 3;  // 英文
+  }
+  string StartDxEn = 7;   //  生日开始动效-英语
+  string StartDxAr = 8;   //  生日开始动效-阿语
+  string FrameIcon = 9; // 7、头像框
+  repeated int64 GIftIds = 10;  // 专属礼物id(后端用)
+  string RoomFrameIcon = 11;  // 房间封面框  -- 替换用
+}
+
+message RoomPlayConfReq{
+
+}
+
+message RoomPlayConfRes{
+  message conf {
+    int32 Id = 1; // 房间模式
+    string Name = 2; // 房间名称
+    string Icon = 3; // 房间图标
+    int32 PlayCategory = 4; // 玩法分类
+    // PlayCategory  @see pb.RoomPlayCategory 玩法分类
+	//	0:房间玩法（娱乐拍拍，欢乐PK，跨房PK等，在RoomPattern中定义，对应的PlayType为房间模式）
+	//	1:街机游戏（摩天轮，捕鱼游戏等，对应的PlayType为H5游戏）
+	//	2:休闲游戏（怪物消消乐，Ludo游戏等，在RoomPattern中定义，对应的PlayType为房间模式）
+	//	3:互动类型（真心话大冒险等，在RoomPattern中定义，对应的PlayType为房间模式）
+	//  4:基础房型（基础模式，明星模式）
+	//  5:通用Sud游戏游戏（和“休闲游戏”放在一个tab）
+
+//
+//    string gameUrl = 4; // 房间地址
+//    string gameBanner = 5; // 房间Banner图片
+//    sint32 start_hour   = 6;//开放时间
+//    sint32 end_hour     = 7;//结束时间
+  }
+  repeated conf confList = 1;
+}
+
+service RoomExtObj_room {
+
+   // 直播面板数据
+  rpc QueryLiveRoomPanelData_30056(QueryLiveRoomPanelDataReq) returns(QueryLiveRoomPanelDataRes);
+   // 直播结算
+  rpc QueryLiveRoomFinalData_30082(QueryLiveRoomFinalDataReq) returns(QueryLiveRoomFinalDataRes);
+
+}

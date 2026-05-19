@@ -1,0 +1,106 @@
+syntax = "proto3";
+package live;
+
+// 房间模式 6.3.5及之后版本不再使用
+enum RoomPattern {
+  // 开黑
+  RP_GAME = 0;
+  // 标准八麦
+  RP_STANDARD = 1;
+  //明星模式
+  RR_STAR     = 2;
+  //PK模式
+  RR_PK       = 3;
+  // 跨房PK
+  RP_RoomBattle = 10;
+  //标准(10麦)
+  PR_SD_TEN = 20;
+  //标准(12麦)
+  PR_SD_TWE = 21;
+  //标准(15麦)
+  PR_SD_SIXT = 22;
+  // 标准20麦
+  PR_SD_20 = 23;
+  // 标准25麦
+  PR_SD_25 = 24;
+  // // 明星模式
+  // RP_StartMode = 20;
+  // // PK模式
+  // RP_PKMode = 21;
+  // // 拍拍模式
+  // RP_PPMode = 22;
+  // // 魅力比拼
+  // RP_CharmMode = 23;
+  // // 互动游戏
+  // RP_ChatGame = 24;
+  // // 飞行棋游戏（SUDMGP）
+  // RP_LudoGame = 25;
+  // // 桌球游戏（SUD）
+  // RP_SudBilliards = 26;
+  // // 怪物消消乐
+  // RP_MonsterCrush = 27;
+  // // 连连看
+  // RP_FoodConnect = 28;
+  // // 大富翁
+  // RP_Monopoly = 29;
+  // 篝火模式
+  RP_Bonfire = 30;
+  // 音乐模式
+  RP_Fun = 31;
+  // 视频模式
+  RP_Video = 32;
+  RP_TureTalk = 33; // 真心话大冒险
+  RP_PrankEnum = 34;
+
+  // 房间福袋
+  RP_RedEnvelope = 35;
+   // CP模式
+  RP_CP = 36;
+  // 生日派对模式
+  RP_BIRTHDAY = 37;
+
+
+  // Sud游戏（40-60）
+  // 飞行棋
+  RP_Ludo = 40;
+  // 克朗棋
+  RP_Carrom = 41;
+  RP_SnakesLadders = 42; //蛇梯
+  RP_Jackaroo = 43;
+  // sud通用房间模式
+  RP_SudCommon = 60;
+}
+
+enum VoiceSdkType {
+  VST_NONE = 0;        //占位不使用
+  VST_TENCENT = 1;     //腾讯sdk
+  VST_AGORA = 2;       //声网sdk
+  VST_BYTEDANCE = 3;  //火山
+}
+
+message RtcInfo {
+  string app_id = 1;
+  VoiceSdkType sdk_type = 2;
+  // 推拉流Token
+  string token = 3;
+}
+
+
+// 麦位模式：0-自由模式，1-排麦模式
+enum SeatModeType {
+    //0-自由模式
+    CHAIR_MODE_TYPE_FREE = 0;
+    //1-排麦模式
+    CHAIR_MODE_TYPE_QUEUE = 1;
+}
+
+enum SeatSetType {
+  UT_MIC          = 0;//麦克风
+  UT_CAMERA       = 1;//摄像头
+}
+
+enum RoomType {
+  RMT_AUDIO  = 0;
+  RMT_VIDEO  = 1;
+}
+

@@ -1,0 +1,82 @@
+
+syntax = "proto3";
+package IM;
+
+//获取用户的验证sig
+message UserSigReq {
+
+}
+
+message UserSigRes {
+    string sig = 1;
+}
+
+
+//  系统邮件
+message MailMsg {
+  int64 id = 1;      // mail id
+  int32 cmd_id = 2;    // 广播的cmdId
+  int32 create_at = 3;  // 创建时间
+  bytes data = 4;      // 根据cmdId，创建对应的结构体
+}
+
+// last_read_time值由前端保存在本地，last_read_time更新机制：
+// 1、登录时判断对应的last_read_time>1分钟才请求，请求返回后更新last_read_time为当前时间
+// 2、收到对应cmdId时，更新last_read_time为当前时间
+// 当前对应的cmdId消息有：101001(SystemMsgNotice系统消息), 100137(BroadcastMateMatchMsg交友成功系统消息)
+message ReadMailReq {
+  int32 last_read_time = 1;  // 最后读取时间
+  uint32 msg_belong = 2; // 消息归属。0-系统消息，1-活动消息
+}
+
+message ReadMailRes {
+  repeated MailMsg list = 1;
+  repeated int64 msg_id = 2; // 过期消息id
+}
+
+message LastMailReq {
+  int32 last_read_time = 1;  // 最后读取时间
+  uint32 msg_belong = 2; // 消息归属。0-系统消息，1-活动消息
+}
+
+message LastMailRes {
+  bool flag = 1;      // 是否成功
+}
+
+message UnReadMailReq {
+  uint32 msg_belong = 2; // 消息归属。0-系统消息，1-活动消息
+}
+
+message UnReadMailRes {
+  int32 unread_count = 1;
+  string last_mail_text = 2;
+  string last_send_time = 3;
+}
+
+//系统消息通知 CmdId=101001  CmdId=101002  CmdId=101003 CmdId=101012 CmdId=101023
+message SystemMsgNotice {
+    string msg_title = 1;     //信息标题
+    string msg = 2; //发送内容
+    string picture = 3;     //图片路径
+    uint32 send_time = 4; // 发送时间
+    string link_text = 5;     //跳转描述
+    string router_url = 6; //内部路由跳转地址
+    bytes room_id = 7;     //房间id
+    uint32 status = 8; //消息状态 1.未发送 2.已发送 3.未发送已过期 4.已发送已过期
+    int64 overdue_time = 9; //过期时间
+    uint32 msg_type = 10; //消息类型
+    string condition = 11; //消息条件
+    uint32 msg_belong = 12; //消息归属。0-系统消息，1-活动消息。默认是系统消息
+}
+
+// 广播新邮件 cmdId=101005, 更新last_read_time为当前时间
+message BroadcastMailMsg {
+  MailMsg mail = 1;
+}
+
+//立即过期撤回广播邮件 过期系统消息Id列表
+message OverdueMsgNotice {
+  repeated int64 msg_id = 1; // 过期消息id
+}
+
+

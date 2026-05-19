@@ -1,0 +1,110 @@
+syntax = "proto3";
+package privilege;
+
+import "common/common.proto";
+
+message GetPrivilegeConfReq{
+  string md5 = 1;
+}
+
+message GetPrivilegeConfRes{
+  // 配置数据
+  repeated PrivilegeConf privilegeConf = 1;
+  // 0:需要使用配置更新本地缓存 非0 不用更新
+  int32  status = 2;
+  // 新的md5指纹
+  string md5 = 3;
+}
+
+
+message PrivilegeConf{
+  // 特权id
+  int64 user_privilege_conf_id = 1;
+  // 特权 类型
+  common.PrivilegeTypeCode privilege_type_code = 2;
+  // 特权 名称
+  string privilege_nm = 3;
+  // 特权 图片
+  string privilege_pict = 4;
+  // 特权 动画
+  string privilege_animation = 5;
+  // 特权 vip等级
+  int32 vip_level = 6;
+  // 特权 配置数据
+  PrivilegeConfData privilege_conf_data = 7;
+  // 特权 权重用于排序
+  int32 sort = 8;
+  // 特权描述
+  string privilege_desc = 9;
+  //形状类型
+  int32 style           = 10;
+  // ios气泡图
+  string bubble_ios = 11;
+  // android气泡图
+  string bubble_android = 12;
+  // 特权 动画（长），麦位特有资源
+  string privilege_animation_long = 13;
+    // 特权 图片 阿语
+  string privilege_pict_ar = 14;
+  // 特权 动画 阿语
+  string privilege_animation_ar = 15;
+}
+
+message PrivilegeConfData {
+  // 嵌入到特权动画资源的参数，通常是：{"keyAvatar":"tagTOUXIANG","keyNickname":"tagWENZI"}
+  string EmbeddingData = 1;
+  // 彩色昵称参数
+  repeated string nickname_colors = 2;
+  // 资料卡背景
+  string card_background = 3;
+  // 资料卡头像框
+  string card_frame = 4;
+}
+
+message GetUserPrivilegesReq{
+  int64 playerId = 1;
+  bool ifWithInvalid = 2; // 是否返回全部的特权
+}
+
+message GetUserPrivilegesRes{
+  repeated common.UserPrivilege userPrivilege = 1;
+}
+
+message SwitchUserPrivilegeReq{
+  // 操作的用户特权id
+  int64 user_privilege_id = 1;
+  // 传特权配置的id，适配vip特权
+  int64 privilege_conf_id = 2;
+  // 是为开启，否则为关闭
+  bool if_on = 3;
+}
+
+message SwitchUserPrivilegeRes{
+  // 开启用户特权后，需要关闭的用户特权。例如头像框只能有一个，会返回所有操作关闭的特权ID，方便客户端同步
+  repeated int64 off_privilege_id = 1;
+}
+
+message BroadcastUpdateUserPrivilege {
+  sint64 id = 1;
+  int64 user_privilege_conf_id = 2;
+  bool ifOn = 3;
+  // 特权数据，存放用户特有数据
+  string privilege_data = 4;
+}
+
+message RoomFrameListReq {
+}
+
+message RoomFrame {
+  int64 rel_id = 1; // 房间边框唯一id
+  int64 user_privilege_conf_id = 2; // 特权id
+  string cover_frame = 3; // 边框图片
+  int64 cover_frame_over_time = 4; // 边框过期时间，剩余秒数
+  bool is_selected = 5; // 是否选中，如果列表全部false，表示选中默认边框
+  string frame_name = 6; // 边框名称
+}
+
+message RoomFrameListRes {
+  repeated RoomFrame list = 1;
+}
+

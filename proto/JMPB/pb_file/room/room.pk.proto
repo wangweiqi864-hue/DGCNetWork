@@ -1,0 +1,122 @@
+syntax = "proto3";
+package live;
+import "room/room.player.proto";
+
+enum PkEventType {
+    PkEventNone = 0;
+    //进度变更（会在PK进度条发生变化时触发）
+    PkProgressChange = 1;
+    //状态变更（会在PK开始，结束时触发）
+    PkStatusChange = 2;
+  }
+  
+  //cmd=110019
+  message PkNotify {
+    PkEventType type = 1;
+    PkInfo info = 2;
+  }
+  
+// 通用排行榜用户信息
+message RankPlayer {
+    sint64 id = 1;
+    // 昵称
+    string name = 2;
+    // 头像
+    string icon = 3;
+    // 财富等级
+    int32 wealth_level = 4;
+    // 魅力等级
+    int32 charm_level = 5;
+    // 排行榜数值
+    int64 rank_score = 6;
+    // 排行榜名次
+    int32 ranking = 7; //0表示未上榜， 1表示第一名，2表示第二名以此类推
+    // 奖励图标
+    string reward_icon = 8; // 奖励图标
+      // 神秘人
+    bool open_mystery = 9;
+  }
+  
+  // 通用排行榜用户信息列表
+  message RankPlayerList {
+    repeated RankPlayer list = 1;
+    RankPlayer my = 2;
+  }
+  
+  enum PkStatus {
+    // 未开始
+    PkStatusNone = 0;
+    // 进行中
+    PkStatusInProgress = 1;
+    // 已结束
+    PkStatusEnd = 2;
+  }
+  
+  enum PkTeamName {
+    PkTeamNone = 0;
+    // 红队（麦位2, 3, 4, 5）
+    PkTeamRed = 1;
+    // 蓝队（麦位6, 7, 8, 9）
+    PkTeamBlue = 2;
+  }
+  
+  message PkTeamData {
+    PkTeamName team_name = 1;
+    int64 score = 2;
+    RankPlayerList top_contrib = 3;
+    map<int64, int64> chair_charms = 4;
+  }
+  
+  message PkConfig {
+    repeated int32 duration_minutes = 1;
+  }
+  
+  message PkInfo {
+    PkStatus status = 1;
+    // 送礼总价值最高的用户
+    LivePlayer mvp = 2;
+    // 收礼总价值最高的用户
+    LivePlayer star = 3;
+    // 战队数据，key为战队名称 (取值参考：PkTeamName）
+    map<int32, PkTeamData> team_data = 4;
+    // 剩余秒数（PK状态为进行中有效）
+    int32 remain_seconds = 5;
+    // 胜利队伍，0表示平局（状态为结束时有效）
+    PkTeamName winner = 6;
+    // 玩法配置（主动查询的时候会填充，推送的时候不会）
+    PkConfig config = 7;
+  }
+  
+  // PK贡献榜
+  message PkContribRank {
+    //贡献榜，key为战队名称 (取值参考：PkTeamName）
+    map<int32, RankPlayerList> ranks = 1;
+  }
+  
+  enum PkOperateCode {
+    PkOpNone = 0;
+    // 开始PK
+    PkOpStart = 1;
+    // 结束PK
+    PkOpEnd = 2;
+    // 查询PK数据
+    PkOpQueryInfo = 3;
+    // 查询PK贡献榜
+    PkOpQueryContribRank = 4;
+  }
+  
+  message PkOperateReq {
+    // 操作类型
+    PkOperateCode op_code = 1;
+    // 持续时间
+    int32 duration_minute = 2; // PK时间（op_code = 1）
+    // 房间Id（只要用来处理预览房间无法从上下文获得房间的问题，如果上下文获取不到房间Id会尝试应用这个）
+    int64 room_id = 3;
+  }
+  
+  message PkOperateRes {
+    // PK信息（op_code == 3）
+    PkInfo info = 1;
+    // PK更新榜（op_code == 4）
+    PkContribRank contrib = 2;
+  }

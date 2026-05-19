@@ -1,0 +1,6 @@
+framework module DGCDGCNetWork {
+  umbrella header "DGCDGCNetWork-umbrella.h"
+
+  export *
+  module * { export * }
+}

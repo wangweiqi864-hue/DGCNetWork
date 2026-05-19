@@ -1,0 +1,397 @@
+syntax = "proto3";
+package home;
+
+import "room/room.type.proto";
+import "home/home.ext.proto"; 
+import "common/common.proto";
+
+enum HomeType {
+    // 首页
+    HT_Index = 0;
+}
+message GetPHomeNavReq {
+    // 首页页面ID，默认0，新首页ID，路由模块对应的ID
+    int32 page_id = 1;
+    HomeType type = 2;
+}
+  
+message GetPHomeNavRes {
+    // 是否记忆选中
+    // bool is_remember = 1;
+    // 导航
+    repeated PHomeNav nav_list = 2;
+    // md5
+    string md5 = 3;
+    // 导航右侧的按钮
+    // repeated Button buttons = 4;
+}
+
+message PHomeNav {
+    int32 id = 1;
+    // 名字
+    string name = 2;
+    // 排序
+    int32 sort = 3;
+    // 是否默认
+    bool is_default = 4;
+    // // 模块列表
+    repeated PHomeMod mod_list = 5;
+    // // 图标url
+    // string img_url = 6;
+    // // 选中
+    // string selected_img_url = 7;
+    // // 标签样式
+    // PHomeNavStyle nav_style = 8;
+    // 首页类型
+    PHomeNavType nav_type = 9;
+}
+
+enum PHomeNavType {
+  default = 0;
+  // 推荐
+  recommend = 1;
+  // 音频
+  audio = 2;
+  // 视频
+  video = 3;
+  // 我的
+  my = 4;
+}
+
+message GetPHomeModReq {
+    int32 nav_id = 1;
+    int32 sub_nav_id = 2;
+    int32 mod_id = 3;
+    int32 index = 4;
+    // 是否到了最后一条数据
+    bool is_end = 5;
+    // PHomeClassify classify = 6;
+}
+  
+message GetPHomeModRes {
+    // 导航
+    repeated PHomeMod list = 1;
+}
+
+message PHomeMod {
+    int32 id = 1;
+    // 标题
+    string title = 2;
+    // 是否显示标题
+    // bool is_show_title = 3;
+    // 样式
+    PHomeModStyle style = 4;
+    // 是否有右边按钮
+    // bool is_show_ctrl_btn = 5;
+    // 右边按钮url
+    // string ctrl_btn_img_url = 6;
+    // 右边按钮规则
+    // PHomeMoreRule ctrl_btn_rule = 7;
+
+    // 是否到了最后一条数据
+    bool is_end = 9;
+    // 模块分类
+    // repeated PHomeModClassify classifys = 10;
+    // 数据类型
+    PHomeDataType data_type = 11;
+    // 数据
+    bytes data_byte = 12;
+    // // 路由
+    // PHomeRouteType route_type = 13;
+    // // 路由
+    // string route = 14;
+    // // 是否是插入模块
+    bool is_inster_mod = 15;
+    // // 展示条数 0-全部展示
+    // int32 show_num = 16;
+    // // 缺省图图片
+    // string empty_img = 17;
+    // // 曝光数量
+    // int32 exposure_num = 18;
+    // // 跟随语
+    // string follow_msg = 19;
+    // // 是否最新的排序规则
+    // bool is_new = 20;
+    // int32 sub_page_style = 21;
+    // // 右上角路由
+    // string right_top_route = 22;
+    // // 缺省图路由地址
+    // string empty_img_route = 23;
+    // // banner图片地址、目前仅用于技能列表样式和技能列表滚动样式
+    // string banner_url = 24;
+    // // banner图片点击跳转地址
+    // string banner_skip_url = 25;
+    // // 优惠券折扣是否显示
+    // bool is_show_coupon_discount = 26;
+}
+
+enum PHomeDataType {
+    // 占位
+    HDT_DataTypeNone = 0;
+    // 房间数据    PHomeEntryRoomList
+    HDT_DataTypeRoom = 1;
+    //  玩家       PHomeEntryPlayerList
+    HDT_DataTypePlayer = 2;
+    // banner       PHomeEntryBannerList
+    HDT_DataTypeBanner = 3;
+    // 二级导航    PHomeEntrySubNavList
+    HDT_DataTypeSubNav = 4;
+    // 广播交友  PHomeEntryBcFriendList
+    HDT_DataTypeBcFriend = 6;
+    // 路由数据    PHomeRouterList
+    HDT_DataTypeRouter = 7;
+    // 榜单         PHomeRankList
+    HDT_DataTypeRank = 8;
+    // 活动     PHomeActivityList
+    HDT_DataTypeActivity = 9;
+}
+
+message PHomeEntryPlayerList {
+  repeated PHomeEntryPlayer list = 1;
+}
+message PHomeEntryPlayer {
+  // 用户ID
+  int64 id = 1;
+  // 索引
+  int32 index = 2;
+  // 短号
+  sint64 id2 = 3;
+  //名称
+  string name = 4;
+  // 图标路径
+  string icon = 5;
+  bool has_room_passwd = 6;
+  //推荐语
+  string recommend_word = 7;
+  //关注量
+  sint64 fans = 8;
+  // 当前房间
+  sint64 room_id = 9;
+  PluginSexType sex = 10;
+  //封面图
+  string cover_pic = 12;
+  // 0 不显示认证标签
+  sint64 flag = 13;
+  // 个性签名
+  string signature = 14;
+  // 距离m  -1 不显示
+  int32 distances = 15;
+  // 省
+  string province = 16;
+  // 市  城市 空不显示
+  string municipality = 17;
+  // 县/区
+  string county = 18;
+  // 乡镇/街道等详细地址
+  string address_detail = 19;
+  // 推荐标签，按逗号分割
+  string recommend_tags = 20;
+  // 是否在线
+  bool is_online = 22;
+  // 相册
+  repeated PlayerImageInfo image_list = 23;
+  // 数据刷新时间
+  int64 update_time = 24;
+  // 年龄
+  int32 age = 28;
+   // roomState
+  RoomState room_state = 29; // 1-在房间 2-在麦
+  // 房间名字
+  string room_name = 30;
+  // 房间人数
+  int64 room_player_num = 31;
+  // 上麦时间
+  int64 sitChairTime = 32;
+  // 用户特权
+  repeated common.Effect effect = 33;
+}
+
+enum RoomState {
+  UNKNOWN = 0;
+  InRoom = 1; //在房间
+  InChair = 2; //在麦
+}
+
+message PHomeEntryRoomList {
+    repeated PHomeEntryRoom list = 1;
+}
+  
+message PHomeEntryRoom {
+    // ID
+    int64 id = 1;
+    // 索引
+    sint32 index = 2;
+    // PluginRoomType type = 3;
+    // 短号
+    // sint64 id2 = 4;
+    string name = 5;
+    // 图标路径
+    // string icon = 6;
+    //在线人数
+    int32 online_num = 7;
+    //是否密码房
+     bool has_passwd = 8;
+    // 房主是否房间,0不在线,1在线
+    // bool is_room_owner_online = 9;
+    // 欢迎语
+    string greeting = 10;
+    //房间模式
+    sint32 pattern = 11;
+    //房间简介图片 （公告栏）
+    string details_img = 12;
+    // 房间标志位
+    // int32 flags = 13;
+    // sint64 rank = 14;
+    // 是否置顶
+    // bool isTop = 15;
+    //推荐语
+    // string recommend_word = 16;
+    //关注量
+    // sint64 fans = 17;
+    // 用户所在的房间ID
+    sint64 room_id = 18;
+    //优质主播在线人数
+    // sint32 high_quality_online_num = 19;
+    // 房间标签url  废弃掉了
+    // PluginHomeTips tips = 20;
+    // 最后进入时间，有就显示，没有就显示
+    // sint64 last_time = 21;
+     PluginSexType sex = 22;
+    // 热度
+    // sint32 heat = 23;
+    // 正在连麦人数
+    // sint32 chairs = 24;
+    //封面图
+    string cover_pic = 25;
+    // repeated RoomDecorate room_decorate = 26;
+    // 视频信息
+    // PhomeVideoInfo video_info = 27;
+    // PlayerBaseInfo host = 28;
+    // repeated RoomPlayerList RoomPlayerList = 29;
+    //福袋数量
+    // sint32 RedNum = 30;
+    // string CC = 31;
+    string cover_frame = 32;
+    // sint64 cover_frame_over_time = 33;
+    string channel_token = 34; // RTCToken
+    live.VoiceSdkType sdk_type = 35; // Rtc类型
+    string sdk_appid = 36; // RTC appId
+    string own_name = 37; // 房主昵称
+    //房间排行奖励
+    repeated bool rank_tips         = 39;
+    // 角标图片
+    string badge_img = 40;
+    // 角标说明
+    string badge_desc = 41;
+    // 是否有可领取福袋
+    bool have_available_bag = 42;
+    // 角标扩展({left:"#xxxx",right:"###"} left：左色值 right：右色值)
+    string badge_ext = 43;
+}
+
+enum PHomeModStyle {
+  // 占位
+  HMS_StyleZero = 0;
+  // 房间2P大图
+  HMS_StyleRoom2PBig = 11;
+  HMS_StyleRoomListSlide = 40;
+}
+
+message PHomeEntryBannerList {
+    repeated PHomeEntryBanner list = 1;
+}
+message PHomeEntryBanner {
+    // 房间ID
+    int64 id = 1;
+    // 索引
+    int32 index = 2;
+    // 图片url
+    string url = 3;
+    // 路由
+    string route = 4;
+    // banner名字
+    string name = 5;
+    // banner类型  0 图片 1 H5
+    int32 banner_type = 6 ;
+}
+
+enum BannerPosType {
+    BPT_Zero               = 0;
+    //充值页
+    BPT_WebPayPage         = 1;
+    //内购充值页面
+    BPT_INPayPage          = 2;
+    //礼物面板
+    BPT_GiftPannel         = 3;
+}
+message GetBannerDataReq {
+    //展示位置
+    BannerPosType pos_type        = 1;
+}
+  
+message GetBannerDataRes {
+    repeated PHomeEntryBanner list = 1;
+}
+  
+
+enum BannerJoinType {
+  BannerJoin_Default = 0;
+  //平台
+  BannerJoin_Platform = 1;
+  //房间
+  BannerJoin_Room = 2;
+}
+
+message GetJoinBannerDataReq {
+  //展示位置
+  BannerJoinType type = 1;
+  string Bannerkey = 2;
+}
+
+message GetJoinBannerDataRes {
+  repeated PHomeEntryBanner list = 1;
+}
+
+message ModeLogic {
+
+}
+
+
+message PHomeRankList {
+  repeated PHomeRank list = 1;
+}
+
+message PHomeRank {
+  // 榜单名称
+  string rank_name = 1;
+  // 榜单图标
+  string rank_icon = 2;
+  // 显示数量
+  int32 num = 3;
+  // 跳转路由，无事件是为空字符串
+  string router = 4;
+  // 排行榜单
+  repeated PHomeRankItem rank_list = 5;
+  // 排行榜类型
+  PluginRankType rank_type = 6;
+  // 标题
+  string title = 7;
+  string msg = 8; //
+  // 背景图片
+  string bg_image = 9;
+}
+
+enum PluginRankType {
+  // 占位
+  PRT_ZERO = 0;
+  // 魅力日榜
+  PRT_CharmDay = 1;
+  // 财富日榜
+  PRT_WealthDay = 2;
+}
+
+message PHomeRankItem {
+  sint64 id = 1;
+  string icon = 2; // 头像
+  int64 index = 3;  // 排名
+}

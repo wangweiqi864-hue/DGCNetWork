@@ -1,0 +1,186 @@
+syntax = "proto3";
+package common;
+
+// 公会铭牌
+message GuildNameplate {
+  // 铭牌名
+  string name = 1;
+  // 图标
+  string url = 2;
+  // 背景色
+  string bg_color = 3;
+  // svga
+  string svga_url = 4;
+  // svga 宽度
+  int32 svga_width = 5;
+  // svga 高度
+  int32 svga_height = 6;
+  // 渐变背景色 起始
+  string bg_color_start = 7;
+  // 渐变背景色 结束
+  string bg_color_end = 8;
+  // 铭牌类型
+  GuildNameplateType nameplate_type = 9;
+  // 描边颜色
+  string border_color = 10;
+  enum GuildNameplateType {
+    // 普通
+    GNT_GENERAL = 0;
+    // 公会流水活动奖励铭牌
+    GNT_FLOW = 1;
+  }
+}
+
+// 所使用客户端类型
+enum DeviceType {
+  DT_UNKNOWN = 0;
+  DT_FLASHPLAYER = 1;
+  DT_ANDROID_PHONE = 20;
+  DT_IOS_PHONE = 40;
+  DT_WINDOWS_ASSISTANT = 80; // 助手
+  DT_WINDOWS_PC = 90;        // PC
+  DT_ROBOT = 100;
+}
+
+message ZoneCountry {
+  string country_en = 1; //英文名，用于获取国家图标
+  string country_name = 2; //显示的国家名称（国际化后的文本）
+  int64 country_code = 3; //国家区号
+}
+
+enum SexType {
+  UNKNOWN = 0;
+  MAIL = 1;
+  FEMAIL = 2;
+}
+
+enum AuditStatus {
+  AS_Audit_Pass = 0;      // 默认 审核通过
+  AS_Auditing = 1;        // 审核中
+  AS_Audit_Refuse = 2;    // 审核拒绝
+}
+
+message AgodaKey {
+  string permission_key = 1;
+}
+
+
+// 房间管理员类型
+enum RoomAdminType {
+  RAT_GUEST = 0; // 不属于本场景
+  RAT_NORMAL = 10; // 普通成员
+  RAT_ADMIN = 20; // 管理员
+  RAT_OWNER = 30; // 房主
+  RAT_SUPER_ADMIN = 40;  // 超级管理员
+  RAT_BLACK = -5; // 黑名单
+  RAT_TEMP_ADMIN = 21; // 临时管理员
+}
+
+
+enum PrivilegeTypeCode {
+  TTC_Nil = 0;
+  // 头像框
+  TTC_Frame = 1;
+  // 座驾
+  TTC_Vehicle = 2;
+  // 勋章
+  TTC_Medal = 3;
+  // 1位靓号
+  TTC_LuckyNumber = 4;
+  //2位靓号
+  TTC_DoubleShortID = 5;
+  //3位靓号
+  TTC_ThreeShortID = 6;
+  //4位靓号
+  TTC_FourShortID = 7;
+  //5位靓号
+  TTC_FiveShortID = 8;
+  //6位靓号
+  TTC_SixShortID = 9;
+  //7位靓号
+  TTC_SevenShortID = 10;
+  //气泡
+  TTC_PAO = 12;
+  //麦位连线
+  TTC_MicConnect = 13;
+  // 房间封面框
+  TTC_RoomFrame = 14;
+  // 皮肤
+  TTC_Skin = 15;
+  // 头衔
+  TTC_Title = 16;
+  // 称号
+  TTC_Designation = 17;
+  // 资料卡
+  TTC_ProfileCard = 18;
+  // 麦克风
+  TTC_Mic = 19;
+  // 彩色昵称
+  TTC_ColorNickname = 20;
+   // 礼物流光
+  TTC_GiftStreamer = 21;
+  // 在线列表背景
+  TTC_OnlineListBg = 22;
+  // 特殊字母ID（靓号类型）
+  TTC_LetterShortID = 23;
+}
+
+message UserPrivilege {
+  // 特权id
+  int64 user_privilege_rel_id = 1;
+  // 特权类型
+  PrivilegeTypeCode privilege_type_code = 2;
+  //特权 ID
+  int64 user_privilege_conf_id = 3;
+  //发放 时间
+  string provide_time = 4;
+  //特权 结束 时间
+  string privilege_end_time = 5;
+  //特权 存放用户特有数据
+  string privilege_data = 6;
+  // 剩余 秒，大于10年的为永久
+  int64 remain_sec = 7;
+  // 是否开启
+  bool ifValid = 8;
+}
+
+message Effect {
+  // 特权类型
+  PrivilegeTypeCode type_code = 1;
+  // 配置id
+  sint64 conf_id = 2;
+  // 特权数据 存放用户特有数据 靓号就是 靓号本身，其他是其他
+  string privilege_data = 3;
+}
+
+
+// 20001 通用活动跑马灯
+message CommonPushMarquee{
+  int32 show_type = 1; // 0 默认 1 只在房间展示
+  string content = 2; // 内容
+  string format = 3;
+  int32  duration = 4; // 展示时间
+  int32 height = 5;
+  int32 left_padding = 6;
+  int32 text_Y = 7;
+  string text_color = 8;
+  string text_size = 9;
+  int32 display_type = 10; // 1 左到有滚动 2 从无到有
+  string url = 11;
+  bool is_native = 12; // 是否原生
+  string route_url = 13; // 路由地址
+}
+
+// cmd_id = 20002
+message SendBigRedEnvelope{
+  int64 room_id = 1;
+  int64 sender_id =2;
+  string nickname = 3;
+  string avatar = 4;
+  int32 gold = 5; // 金币总数
+  int64 bag_id = 6; //福袋id
+}
+
+// cmdId = 20003
+message ServerMidnightEvent{
+}

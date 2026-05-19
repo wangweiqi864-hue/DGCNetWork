@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package PBExpression;
+
+message PlayerMicFaceCategoryReq{
+
+}
+
+message PlayerMicFaceCategoryRes{
+    repeated MicFaceCategory list = 1;
+
+    message MicFaceCategory{
+        int32 micFaceCategoryId = 1; // 麦位表情 分类 ID
+        string micFaceCategoryName = 2; // 麦位表情 分类 名称
+        string micFaceCategoryIcon = 3; // 麦位表情 分类 图标
+        bool ifPrivilege = 4; //是否特权，排序在最后
+    }
+}
+
+
+message MicFaceListReq{
+  int32 micFaceCategoryId = 1; // 麦位表情 分类 ID
+}
+
+message MicFaceListRes {
+  message MicFace{
+    int32 micFaceId = 1; // 麦位表情ID
+    string micFaceName = 2; // 麦位表情名称
+    string micFaceTypeCode = 3; // 麦位表情 类型 代码
+    string micFaceIcon = 4; // 麦位表情图标
+    string micFaceResUrl = 5; // 麦位表情资源地址
+    int32 micFaceRepeatTimes = 6; // 播放次数（小于等于1都认为是1次）
+  }
+  repeated MicFace list = 1;
+}

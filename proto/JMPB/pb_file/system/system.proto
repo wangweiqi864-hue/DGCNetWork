@@ -1,0 +1,269 @@
+syntax = "proto3";
+import "common/common.proto";
+
+package system;
+
+// KG类型
+enum OOType {
+  UN = 0; //占位不能使用
+  WHALE_ACTIVITY_NOTICE = 88; // 鲸鱼活动 预告 开关
+    
+  SEND_GIFT_SELF = 301;// 是否可以对自己送礼
+  // 是否开启房间火箭玩法
+  OPEN_ROOM_ROCKET = 302;
+  // 充值统计
+  OPEN_CHARGE_STAT = 400;
+  //AI声网降噪
+  OPEN_AI_AGO = 401;
+
+}
+
+message OnOffStatus {
+  //0关，1开
+  sint32 status = 1;
+  OOType type = 2;
+}
+
+message OOStatus {
+  sint32 status = 1;    //0关，1开
+  OOType type = 2;
+}
+
+message GetOOListReq {
+  sint64 player_id = 1; //用户id
+}
+message GetOOListRes {
+  repeated OOStatus status_list = 1;
+}
+
+message QueryHaveSaudiFlagReq{
+  int64 playerId = 1;
+}
+
+message QueryHaveSaudiFlagResp{
+  bool on = 1; // 是否佩戴了国旗。佩戴了返回true，未拥有/未佩戴/不在活动时间都返回false
+  string icon = 2; // 过期图标地址
+}
+
+
+message SysConfUpdate {
+    SysConfType type = 1;    // 类型
+}
+
+enum SysConfType {
+    SysConfTypeNONE = 0; //占位
+    TypeGift        = 1; //礼物配置更新
+}
+
+
+message GetNoAuthBeforeLoginReq {
+  common.DeviceType device = 1;
+  string     version = 2; // 6.5.0
+}
+
+message GetNoAuthBeforeLoginRes {
+  //无认证开关
+  repeated OnOffStatus list       = 1;
+  //资源配置 "rank_wealth_icon_path","rank_charm_icon_path"
+  map<string, string> res_config  = 2;
+}
+
+// 所使用客户端类型
+enum DeviceType {
+  DT_UNKNOWN = 0;
+  // DT_ANDROID_PHONE = 20;//android
+  DT_IOS_PHONE = 40;    //ios
+}
+// 网络环境
+enum NetworkType {
+  NT_Zero        = 0; // 全部网络
+  NT_Wifi        = 1;
+  NT_5G          = 2;
+  NT_4G          = 3;
+}
+
+message DeviceReportReq {
+  string device_id = 1;      // 设备id
+  DeviceType device_type = 2;
+  string client_version = 3;  // 客户端版本
+  NetworkType network = 5;
+  int64 uid = 6;              // 用户id，[可选]
+  // int32 api_level = 7;        // api level
+  string phone_brand = 8;    // 手机品牌
+}
+
+enum UpgradeType {
+  UT_Zero        = 0;
+  UT_Recommend   = 1;  // 推荐
+  UT_Forced      = 2;  // 强制
+  UT_Silent      = 3;  // 静默
+}
+
+message DeviceReportRes {
+  int32 upgrade_id =1;//          //升级配置id
+  UpgradeType upgrade_type =2;   // 升级方式
+  NetworkType network = 3;        // 网络环境
+  // string download_url = 4;        // 下载url
+  repeated string tips = 5;       // 更新tips说明， 多行文本
+  // string check_md5 = 6;           // 校验apk下载是否完整
+  string target_version = 7;      // 升级到目标版本
+  // string bg_url = 8;              // 升级背景图，完整url
+}
+
+message SetDeviceInfoReq {
+  DeviceType deviceType = 1;
+  string deviceId = 2;
+  string push_token = 3; // 推送token
+}
+
+message SetDeviceInfoRes{
+
+}
+
+message GetH5GameConfReq {
+}
+
+message GetH5GameConfRes {
+  message H5GameConf{
+    int32 gameId = 1; // HKYS游戏ID
+    string gameName = 2; // 游戏名称
+    string gameIcon = 3; // 游戏图标
+    string gameUrl = 4; // 游戏地址
+    string gameBanner = 5; // 游戏Banner图片
+    sint32 start_hour   = 6;//开放时间
+    sint32 end_hour     = 7;//结束时间
+  }
+  repeated H5GameConf h5GameConf = 1;
+}
+
+message CSAgentOperateReq{
+  enum Type{
+    UnknownOperate = 0; // 占位
+    ModifySex = 1; // 修改性别
+    ModifyCountry = 2; // 修改国家
+    CleanInfo = 3; // 清空用户信息
+  }
+  enum Info{
+    UnknownInfo = 0; // 占位
+    Avatar = 1; // 头像
+    Nickname = 2; // 昵称
+    RoomImage = 3; // 房间封面
+  }
+  Type type = 1; // 操作类型
+  int64 target_id = 2;// 目标用户
+  repeated Info infos = 3; // 清空用户信息时，选择清空哪些信息
+}
+
+message CSAgentOperateResp{
+}
+
+enum SystemNoticeType {
+  SNT_ZERO = 0;
+  SNT_RedPack = 1;            // 福袋
+  SNT_Crackegg = 2;            // 砸蛋
+  SNT_WheelGame = 3;            //摩天轮
+}
+
+//公屏信息 cmdId = 101028
+message SystemNotice{
+  string msg = 1;//英语
+  string default_color = 2;
+  SystemNoticeType type = 3;
+  string ARMsg = 4;//阿语
+}
+
+message GetGiftEffectReq {
+
+}
+
+message GiftEffectConfig {
+  uint32 id = 1;
+  string background = 2;
+}
+
+message GetGiftEffectRes {
+  // 流光特效
+  repeated GiftEffectConfig stream_effects = 1;
+  // 跑马灯特效
+  repeated GiftEffectConfig marquee_effects = 2;
+}
+
+
+message GiftPrankEnumGiftReq {
+}
+message GiftPrankEnumGiftRes {
+  repeated int64 list = 1;     //礼物列表
+}
+
+message GetLoginDialogReq {
+
+}
+
+message PopItemDialog {
+    string Route                          =1;
+}
+
+message GetLoginDialogRes {  // Ac_LoginPopDialog = 80001; //登录推送弹窗
+  repeated string dialogsRoute          =1;
+}
+
+message PushTopDialog { // cmdId   AC_TopPopDialog  = 80000;
+  //文案
+  string tips                             =1;
+  //图标
+  string Icon                             =2;
+  //背景图片
+  string BgUrl                            =3;
+  //跳转路由
+  string Route                            =4;
+}
+
+//cmd：410003
+message LuckyGiftPrizeNotice {
+  message LuckyGiftPrize {
+    int32 multiplier = 1; // 倍数
+    int32 gold = 2;       // 单次获得的金币数
+    int32 num = 3;        // 次数
+    int32 style = 4;      // 中奖人自己看的中奖弹框效果（1: 普通弹框 2: 带吐钱效果）
+    int32 screen_msg_scope = 5; // 公屏范围 0: 不要显示公屏 1: 自己看 2: 所在房间看 3: 全服房间看
+    int32 screen_msg_color = 6;  // 1:蓝色 2:紫色 3:橙色
+    int32 marquee_scope = 7; // 跑马灯范围 0: 不显示 1: 自己看 2: 所在房间看 3: 全服房间看 4: 全服任意页面
+  }
+
+
+  repeated LuckyGiftPrize prizes = 1;
+  int32 gift_num = 2;    // 用户一次送礼个数
+  int64 room = 3 ;       // 送礼发生的房间
+  int64 player_id = 4;   // 中奖人Id（用来判断是否是自己中奖）
+  string player_name = 5; // 中奖人昵称
+  string player_icon = 6; // 中奖人头像
+}
+
+
+//活动推送消息 80002
+message ActivityPushRes {
+  //路由关键字
+  string Keyword        =1;
+  //调用参数
+  string args           =2;
+}
+
+
+// 客户端入口 对应cmdId 80003
+message ActPushEntranceRes{
+  int64 endCountDown = 1; // 结束倒计时(秒) (结束时间减当前时间)
+  string url = 2;
+  string icon = 3; // 图标地址
+}
+
+// cmdId = 80004
+message SaudiFlagEvent{
+  int64 player_id = 1;
+  string icon = 2; // 国旗图标地址
+  bool is_wear = 3; // 是否佩戴
+}
+
+// cmdId=80005
+message SaudiEndEvent{
+  // 不需要具体内容。客户端收到这个广播后直接把国旗隐藏掉即可
+}
